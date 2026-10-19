@@ -42,6 +42,25 @@ This writes a new migration in `supabase/migrations/` that updates stations by t
 
 Station data © OpenStreetMap contributors, available under the [Open Database License](https://www.openstreetmap.org/copyright). The map shows this credit in its attribution button.
 
+## Price reports and points
+
+The app never writes prices or points itself. It calls database functions (`supabase/migrations/20261019130000_price_reports.sql`) that check the rules and write everything in one transaction:
+
+- **Reporting:**
+  - The driver must be within 150 m of the station.
+  - Each driver can send up to 10 prices an hour, and can't report the same fuel at the same station twice within 3 hours.
+  - A price more than 15% away from the median of nearby stations is flagged and needs twice the confirmations.
+- **Voting:**
+  - Other drivers within 1 km mark a pending price "Correct" or "Wrong".
+  - 2 confirmations verify a price, and 2 disputes reject it.
+- **Points:**
+  - The reporter gets +10 for each verified price.
+  - Voters get +2 when their vote matches the result.
+  - Pending points show on the account screen.
+- **Quiet prices:** if a price isn't flagged and nobody disputes it within 6 hours, a scheduled job (pg_cron, every 15 minutes) verifies it. This keeps prices flowing while there are few drivers.
+
+Every number above lives in the `app_config` table. For a demo away from a real station, raise `max_report_distance_m` and `max_vote_distance_m` there, and put them back afterwards.
+
 ## Database
 
 Schema, security rules and seed data live in `supabase/`. Running Supabase locally requires Docker Desktop.

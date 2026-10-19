@@ -8,19 +8,21 @@ import {
   Inter_900Black,
 } from '@expo-google-fonts/inter';
 import { LilitaOne_400Regular } from '@expo-google-fonts/lilita-one';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 
+import { ToastHost } from '@/components/toast';
 import { useAuthListener, useAuthStore, useIsSignedIn } from '@/features/auth/auth-store';
+import { createQueryClient } from '@/lib/query-client';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(createQueryClient);
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -43,6 +45,7 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
       <RootNavigator />
+      <ToastHost />
     </QueryClientProvider>
   );
 }

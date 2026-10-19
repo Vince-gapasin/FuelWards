@@ -14,6 +14,8 @@ export type Station = {
   distance_m: number;
   /** Latest verified price per fuel code, e.g. { DIESEL: { price: 58.5, reported_at } }. */
   prices: Record<string, StationPrice>;
+  /** Price reports waiting for other drivers to confirm or dispute. */
+  pending_count: number;
 };
 
 export type FuelType = { code: string; label: string; short_label: string; sort: number };

@@ -18,6 +18,7 @@ const station = (id: string, distance_m: number, prices: Record<string, number> 
   latitude: 14.6,
   longitude: 121,
   distance_m,
+  pending_count: 0,
   prices: Object.fromEntries(
     Object.entries(prices).map(([fuel, price]) => [
       fuel,

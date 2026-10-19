@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 
 export type Profile = { id: string; username: string; display_name: string | null };
 
-/** The signed-in user's profile and point balance. */
+/** The signed-in user's profile, confirmed points and points still waiting on pending reports. */
 export function useProfile() {
   const userId = useAuthStore((s) => s.session?.user.id);
   return useQuery({
@@ -14,11 +14,12 @@ export function useProfile() {
     queryFn: async () => {
       const [profile, points] = await Promise.all([
         supabase.from('profiles').select('id, username, display_name').eq('id', userId!).single(),
-        supabase.from('user_points').select('balance').eq('user_id', userId!).maybeSingle(),
+        supabase.rpc('my_points').single(),
       ]);
       if (profile.error) throw profile.error;
       if (points.error) throw points.error;
-      return { profile: profile.data as Profile, points: (points.data?.balance as number) ?? 0 };
+      const { balance, pending } = points.data as { balance: number; pending: number };
+      return { profile: profile.data as Profile, points: balance, pendingPoints: pending };
     },
   });
 }

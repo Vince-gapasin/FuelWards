@@ -44,6 +44,11 @@ export default function Account() {
             <Ionicons name="star" size={15} color="#FFDF00" />
             <Text className="font-semibold text-sm text-ink">{data?.points ?? 0} points</Text>
           </View>
+          {data?.pendingPoints ? (
+            <Text className="text-center text-sm text-ink-muted">
+              +{data.pendingPoints} more waiting for other drivers to confirm your prices
+            </Text>
+          ) : null}
         </View>
         <Button label="Log out" variant="outline" onPress={signOut} loading={signingOut} />
         <View className="items-center">
