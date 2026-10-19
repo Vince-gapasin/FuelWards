@@ -11,6 +11,7 @@ A crowdsourced fuel-price map for the Philippines. Drivers see current pump pric
 - NativeWind (Tailwind) for styling. The brand colours come from Figma and live in `src/theme/colors.js`.
 - Supabase: Postgres with PostGIS, Auth, Row-Level Security, Edge Functions and Storage.
 - TanStack Query, Zustand, react-hook-form and zod.
+- MapLibre with free [OpenFreeMap](https://openfreemap.org) tiles: `@maplibre/maplibre-react-native` on phones and `react-map-gl` on web. No map API key is needed.
 
 ## Getting started
 
@@ -26,6 +27,20 @@ A crowdsourced fuel-price map for the Philippines. Drivers see current pump pric
    Use `npm run android` for the Android emulator or a phone.
 
 Map and native modules need a development build (`npx expo run:android` or `npx eas-cli build --profile development`). Expo Go won't run them.
+
+`npm install` also copies MapLibre's web worker into `public/` (`scripts/copy-maplibre-worker.mjs`), because Metro can't bundle it. If the web map shows "Worker failed to load", run `npm install` again and restart the dev server.
+
+## Stations
+
+Stations come from OpenStreetMap (all `amenity=fuel` in and around Metro Manila). To refresh them, run:
+
+```bash
+node scripts/import-osm-stations.ts
+```
+
+This writes a new migration in `supabase/migrations/` that updates stations by their OpenStreetMap id. Review it, then apply it with `npx supabase db push`. The public Overpass servers are often busy, so the script retries for several minutes.
+
+Station data © OpenStreetMap contributors, available under the [Open Database License](https://www.openstreetmap.org/copyright). The map shows this credit in its attribution button.
 
 ## Database
 

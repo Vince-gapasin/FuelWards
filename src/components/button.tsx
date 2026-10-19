@@ -35,7 +35,8 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: inactive, busy: loading }}
+      aria-disabled={inactive}
+      aria-busy={loading}
       onPress={onPress}
       disabled={inactive}
       className={`h-12 flex-row items-center justify-center rounded-xl px-6 ${containers[variant]} ${inactive ? 'opacity-50' : ''} ${className ?? ''}`}>

@@ -26,10 +26,10 @@ select throws_ok(
   'clients cannot insert price reports directly'
 );
 
--- Stations near the seeded Santa Mesa demo area come back nearest first.
+-- The OpenStreetMap import includes stations around Santa Mesa.
 select ok(
   (select count(*) from public.nearby_stations(14.6015, 121.0058, 3000)) >= 1,
-  'nearby_stations finds the demo stations'
+  'nearby_stations finds stations near Santa Mesa'
 );
 
 select * from finish();

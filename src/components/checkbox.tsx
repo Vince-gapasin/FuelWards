@@ -14,7 +14,7 @@ export function Checkbox({ checked, onChange, label, error }: Props) {
     <View className="gap-1">
       <Pressable
         accessibilityRole="checkbox"
-        accessibilityState={{ checked }}
+        aria-checked={checked}
         onPress={() => onChange(!checked)}
         hitSlop={6}
         className="flex-row items-center gap-2.5 self-start py-1">
