@@ -17,7 +17,7 @@ create type public.redemption_status as enum ('issued', 'used', 'expired', 'canc
 -- ---------------------------------------------------------------------------
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
-  username text not null unique
+  username text not null
     check (username ~ '^[A-Za-z0-9_]{3,20}$'),
   display_name text check (char_length(display_name) <= 40),
   avatar_url text,
@@ -25,6 +25,20 @@ create table public.profiles (
   privacy_accepted_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+-- "Vince" and "vince" are the same username.
+create unique index profiles_username_lower_idx on public.profiles (lower(username));
+
+-- Lets the sign-up form check a username before creating the account (callable by anon).
+create or replace function public.username_available(name text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select not exists (select 1 from public.profiles where lower(username) = lower(name));
+$$;
 
 create or replace function public.is_admin()
 returns boolean

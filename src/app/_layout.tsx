@@ -15,6 +15,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 
+import { useAuthListener, useAuthStore, useIsSignedIn } from '@/features/auth/auth-store';
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -27,7 +29,9 @@ export default function RootLayout() {
     Inter_900Black,
     LilitaOne_400Regular,
   });
-  const ready = fontsLoaded || Boolean(fontError);
+  useAuthListener();
+  const authReady = useAuthStore((s) => s.initialized);
+  const ready = (fontsLoaded || Boolean(fontError)) && authReady;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
@@ -38,7 +42,22 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }} />
+      <RootNavigator />
     </QueryClientProvider>
+  );
+}
+
+function RootNavigator() {
+  const signedIn = useIsSignedIn();
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+      <Stack.Protected guard={signedIn} redirectTo="/welcome">
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+      <Stack.Protected guard={!signedIn} redirectTo="/">
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+      <Stack.Screen name="privacy" options={{ presentation: 'modal' }} />
+    </Stack>
   );
 }

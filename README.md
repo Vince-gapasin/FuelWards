@@ -62,10 +62,20 @@ npx supabase link --project-ref <ref>
 npx supabase db push
 ```
 
+### Email codes on the hosted project
+
+The app confirms sign-ups and resets passwords with 6-digit codes, not links. In the Supabase dashboard, under Authentication → Emails:
+
+- **Confirm signup:** use the contents of `supabase/templates/confirmation.html`.
+- **Reset password:** use the contents of `supabase/templates/recovery.html`.
+- Keep **Confirm email** turned on (Authentication → Sign In / Providers).
+
+Supabase's built-in email sender allows only a few emails per hour. That's enough for a demo. For testing with many accounts, connect a free SMTP provider under Authentication → Emails → SMTP.
+
 ## Checks
 
 ```bash
 npm run check
 ```
 
-This runs the type-check, ESLint and Prettier. CI (`.github/workflows/ci.yml`) also builds the web app and tests the database.
+This runs the type-check, ESLint, Prettier and the Jest unit tests. CI (`.github/workflows/ci.yml`) also builds the web app and tests the database.
