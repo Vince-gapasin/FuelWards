@@ -62,15 +62,26 @@ npx supabase link --project-ref <ref>
 npx supabase db push
 ```
 
-### Email codes on the hosted project
+To send the sign-in settings in `supabase/config.toml` (password rules, code length, redirect URLs):
 
-The app confirms sign-ups and resets passwords with 6-digit codes, not links. In the Supabase dashboard, under Authentication → Emails:
+```bash
+npx supabase config push
+```
 
-- **Confirm signup:** use the contents of `supabase/templates/confirmation.html`.
-- **Reset password:** use the contents of `supabase/templates/recovery.html`.
-- Keep **Confirm email** turned on (Authentication → Sign In / Providers).
+### Email codes (needs your own email sender)
 
-Supabase's built-in email sender allows only a few emails per hour. That's enough for a demo. For testing with many accounts, connect a free SMTP provider under Authentication → Emails → SMTP.
+The app confirms sign-ups and resets passwords with 6-digit codes, using the templates in `supabase/templates/`. On the free plan, Supabase won't accept custom templates while its built-in email sender is in use. That sender also only delivers to members of your Supabase organisation.
+
+Until a free SMTP provider (for example Brevo or a Gmail app password) is connected:
+
+- Email confirmation is off, so sign-up logs the user straight in.
+- Password reset by code doesn't work.
+
+To turn the codes on:
+
+1. Add the SMTP provider under Authentication → Emails → SMTP in the dashboard. Its password must stay out of the repo.
+2. In `supabase/config.toml`, uncomment the two `[auth.email.template.*]` sections and set `enable_confirmations = true`.
+3. Run `npx supabase config push`.
 
 ## Checks
 
