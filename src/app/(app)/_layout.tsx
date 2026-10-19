@@ -4,6 +4,7 @@ export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
       <Stack.Screen name="report/[stationId]" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="rewards/index" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

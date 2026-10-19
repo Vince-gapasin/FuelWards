@@ -102,12 +102,14 @@ export default function Home() {
             </Text>
           </View>
           <View className="flex-row items-center gap-2">
-            <View
-              accessibilityLabel={`${profile.data?.points ?? 0} points`}
-              className="flex-row items-center gap-1.5 rounded-full border border-line px-3 py-1.5">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${profile.data?.points ?? 0} points. Open rewards`}
+              onPress={() => router.push('/rewards')}
+              className="flex-row items-center gap-1.5 rounded-full border border-line px-3 py-1.5 active:bg-sky">
               <Ionicons name="star" size={15} color="#FFDF00" />
               <Text className="font-semibold text-sm text-ink">{profile.data?.points ?? 0}</Text>
-            </View>
+            </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Account"
