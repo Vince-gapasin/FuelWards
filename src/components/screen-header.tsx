@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   title: string;
@@ -13,15 +14,20 @@ type Props = {
 };
 
 export function ScreenHeader({ title, variant = 'back', fallback = '/', right }: Props) {
+  const { t } = useTranslation();
   const leave = () => (router.canGoBack() ? router.back() : router.replace(fallback));
   const button = (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={variant === 'close' ? 'Close' : 'Back'}
+      accessibilityLabel={variant === 'close' ? t('common.close') : t('common.back')}
       hitSlop={10}
       onPress={leave}
       className="h-10 w-10 items-center justify-center rounded-full active:bg-sky">
-      <Ionicons name={variant === 'close' ? 'close' : 'arrow-back'} size={24} color="#1D1B20" />
+      <Ionicons
+        name={variant === 'close' ? 'close' : 'arrow-back'}
+        size={24}
+        className="text-ink"
+      />
     </Pressable>
   );
   return (

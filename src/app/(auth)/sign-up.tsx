@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AuthScreen } from '@/components/auth-screen';
 import { Button } from '@/components/button';
@@ -11,12 +12,12 @@ import { Notice } from '@/components/notice';
 import { TextField } from '@/components/text-field';
 import { TextLink } from '@/components/text-link';
 import { authErrorMessage } from '@/features/auth/errors';
-import { notConfiguredMessage } from '@/features/auth/not-configured';
 import { signUpSchema, type SignUpValues } from '@/features/auth/schemas';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
 
 // Figma: "Sign Up" (9:208). Adds the email address that password reset needs, and privacy consent.
 export default function SignUp() {
+  const { t } = useTranslation();
   const [formError, setFormError] = useState<string | null>(null);
   const {
     control,
@@ -36,14 +37,14 @@ export default function SignUp() {
 
   const onSubmit = handleSubmit(async ({ username, email, password }) => {
     setFormError(null);
-    if (!supabaseConfigured) return setFormError(notConfiguredMessage);
+    if (!supabaseConfigured) return setFormError(t('auth.notConfigured'));
     try {
       const { data: available, error: rpcError } = await supabase.rpc('username_available', {
         name: username,
       });
       if (rpcError) throw rpcError;
       if (!available) {
-        setError('username', { message: 'That username is taken. Choose another one.' });
+        setError('username', { message: t('auth.usernameTaken') });
         return;
       }
 
@@ -61,7 +62,7 @@ export default function SignUp() {
 
       // Supabase hides existing accounts by returning a user with no identities.
       if (data.user && data.user.identities?.length === 0) {
-        setFormError('An account with this email already exists. Try logging in.');
+        setFormError(t('auth.emailExists'));
         return;
       }
       router.replace({ pathname: '/verify-email', params: { email } });
@@ -79,7 +80,7 @@ export default function SignUp() {
         name="username"
         render={({ field }) => (
           <TextField
-            label="Username"
+            label={t('auth.username')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -95,7 +96,7 @@ export default function SignUp() {
         name="email"
         render={({ field }) => (
           <TextField
-            label="Email"
+            label={t('auth.email')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -111,7 +112,7 @@ export default function SignUp() {
         name="password"
         render={({ field }) => (
           <TextField
-            label="Password"
+            label={t('auth.password')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -127,7 +128,7 @@ export default function SignUp() {
         name="confirmPassword"
         render={({ field }) => (
           <TextField
-            label="Re-type password"
+            label={t('auth.retypePassword')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -149,8 +150,8 @@ export default function SignUp() {
             error={errors.acceptPrivacy?.message}
             label={
               <View className="flex-row flex-wrap items-center gap-1">
-                <Text className="text-sm text-ink">I agree to the</Text>
-                <TextLink href="/privacy" label="Privacy Notice" />
+                <Text className="text-sm text-ink">{t('auth.agree')}</Text>
+                <TextLink href="/privacy" label={t('auth.privacyNotice')} />
               </View>
             }
           />
@@ -158,7 +159,7 @@ export default function SignUp() {
       />
 
       <Button
-        label="Sign Up"
+        label={t('welcome.signUp')}
         variant="secondary"
         onPress={onSubmit}
         loading={isSubmitting}
@@ -166,8 +167,8 @@ export default function SignUp() {
       />
 
       <View className="flex-row items-center justify-center gap-1">
-        <Text className="text-sm text-ink-muted">Already have an account?</Text>
-        <TextLink href="/login" label="Log in" replace />
+        <Text className="text-sm text-ink-muted">{t('auth.haveAccount')}</Text>
+        <TextLink href="/login" label={t('auth.logIn')} replace />
       </View>
     </AuthScreen>
   );

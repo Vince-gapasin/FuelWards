@@ -3,6 +3,7 @@ import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Logo } from '@/components/logo';
 
@@ -17,8 +18,9 @@ type Props = {
 
 /** Shared layout for the sign-in screens: back arrow, logo, centred form column. */
 export function AuthScreen({ children, backTo, title, subtitle, showLogo = true }: Props) {
+  const { t } = useTranslation();
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         className="flex-1">
@@ -29,11 +31,11 @@ export function AuthScreen({ children, backTo, title, subtitle, showLogo = true 
             {backTo ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Back"
+                accessibilityLabel={t('common.back')}
                 hitSlop={10}
                 onPress={() => (router.canGoBack() ? router.back() : router.replace(backTo))}
                 className="h-10 w-10 items-center justify-center rounded-full active:bg-sky">
-                <Ionicons name="arrow-back" size={24} color="#1D1B20" />
+                <Ionicons name="arrow-back" size={24} className="text-ink" />
               </Pressable>
             ) : null}
           </View>

@@ -1,4 +1,5 @@
 import { formatDistance } from '@/features/stations/format';
+import i18n from '@/i18n';
 
 type ServerError = { message?: string; details?: string | null; code?: string };
 
@@ -13,39 +14,39 @@ export function reportErrorMessage(
   error: unknown,
   fuelLabel: (code: string) => string = (c) => c,
 ): string {
-  if (error instanceof LocationRequiredError) {
-    return 'Allow location access so we can confirm you’re at the station.';
-  }
+  const t = i18n.t.bind(i18n);
+  if (error instanceof LocationRequiredError) return t('report.errors.location');
   const e = (error ?? {}) as ServerError;
   const meters = Number(e.details);
+  const fuel = fuelLabel(e.details ?? '');
   switch (e.message) {
     case 'too_far':
       return Number.isFinite(meters)
-        ? `You need to be at the station. You’re about ${formatDistance(meters)} away.`
-        : 'You need to be at the station.';
+        ? t('report.errors.tooFarDistance', { distance: formatDistance(meters) })
+        : t('report.errors.tooFar');
     case 'rate_limited':
-      return 'You’ve sent a lot of reports this hour. Try again later.';
+      return t('report.errors.rateLimited');
     case 'already_reported':
-      return `You already reported ${fuelLabel(e.details ?? '')} here recently.`;
+      return t('report.errors.alreadyReported', { fuel });
     case 'price_out_of_range':
-      return `The ${fuelLabel(e.details ?? '')} price doesn’t look right.`;
+      return t('report.errors.priceOutOfRange', { fuel });
     case 'unknown_fuel':
     case 'no_prices':
-      return 'Enter at least one price.';
+      return t('report.errors.noPrices');
     case 'station_not_found':
-      return 'This station isn’t available any more.';
+      return t('report.errors.stationGone');
     case 'not_signed_in':
-      return 'Your session expired. Log in again.';
+      return t('common.sessionExpired');
     case 'own_report':
-      return 'You can’t confirm your own report.';
+      return t('report.errors.ownReport');
     case 'already_voted':
-      return 'You already voted on this price.';
+      return t('report.errors.alreadyVoted');
     case 'already_decided':
     case 'report_not_found':
-      return 'This price was already confirmed or rejected.';
+      return t('report.errors.decided');
   }
   if (error instanceof TypeError || /fetch|network/i.test(e.message ?? '')) {
-    return 'Can’t reach the server. Check your connection and try again.';
+    return t('common.networkError');
   }
-  return 'Something went wrong. Please try again.';
+  return t('common.genericError');
 }

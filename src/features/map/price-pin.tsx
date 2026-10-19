@@ -1,4 +1,5 @@
 import { Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { brandCode, formatPinPrice, priceFor } from '@/features/stations/format';
 import type { Station } from '@/features/stations/types';
@@ -7,11 +8,12 @@ type Props = { station: Station; fuel: string; selected: boolean };
 
 /** Map pin from the prototype: brand code over the price, in the brand's colour. */
 export function PricePin({ station, fuel, selected }: Props) {
+  const { t } = useTranslation();
   const price = priceFor(station, fuel);
   const color = station.brand_color ?? '#011D39';
   return (
     <View
-      accessibilityLabel={`${station.name}, ${price == null ? 'no price yet' : formatPinPrice(price)}`}
+      accessibilityLabel={`${station.name}, ${price == null ? t('map.noPrice') : formatPinPrice(price)}`}
       className="items-center"
       style={{ transform: [{ scale: selected ? 1.15 : 1 }] }}>
       <View
@@ -39,9 +41,10 @@ export function PricePin({ station, fuel, selected }: Props) {
 
 /** Blue dot for the user's position. */
 export function UserDot() {
+  const { t } = useTranslation();
   return (
     <View
-      accessibilityLabel="Your location"
+      accessibilityLabel={t('map.yourLocation')}
       className="h-[18px] w-[18px] items-center justify-center rounded-full bg-action/25">
       <View className="h-3 w-3 rounded-full border-2 border-white bg-action" />
     </View>

@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, ScrollView, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import type { FuelType, SortMode } from './types';
 
@@ -13,6 +14,7 @@ type Props = {
 
 /** Fuel filter chips plus the Nearest / Cheapest sort toggle. */
 export function FuelChips({ fuelTypes, selected, onSelect, sort, onToggleSort }: Props) {
+  const { t } = useTranslation();
   return (
     <ScrollView
       horizontal
@@ -20,7 +22,7 @@ export function FuelChips({ fuelTypes, selected, onSelect, sort, onToggleSort }:
       contentContainerClassName="gap-2 px-3 py-1">
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Sort by ${sort === 'nearest' ? 'nearest' : 'cheapest'}. Tap to change.`}
+        accessibilityLabel={t('sort.label', { mode: t(`sort.${sort}`) })}
         onPress={onToggleSort}
         className="h-8 flex-row items-center gap-1 rounded-full bg-navy px-3 active:bg-navy-600">
         <Ionicons
@@ -28,9 +30,7 @@ export function FuelChips({ fuelTypes, selected, onSelect, sort, onToggleSort }:
           size={13}
           color="#FFFFFF"
         />
-        <Text className="font-semibold text-xs text-white">
-          {sort === 'nearest' ? 'Nearest' : 'Cheapest'}
-        </Text>
+        <Text className="font-semibold text-xs text-white">{t(`sort.${sort}`)}</Text>
       </Pressable>
       {fuelTypes.map((fuel) => {
         const active = fuel.code === selected;
@@ -42,7 +42,7 @@ export function FuelChips({ fuelTypes, selected, onSelect, sort, onToggleSort }:
             accessibilityLabel={fuel.label}
             onPress={() => onSelect(fuel.code)}
             className={`h-8 justify-center rounded-full border px-3 ${
-              active ? 'border-action bg-action' : 'border-line bg-white active:bg-sky'
+              active ? 'border-action bg-action' : 'border-line bg-surface active:bg-sky'
             }`}>
             <Text className={`font-semibold text-xs ${active ? 'text-white' : 'text-ink'}`}>
               {fuel.short_label}

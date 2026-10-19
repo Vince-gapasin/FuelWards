@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AuthScreen } from '@/components/auth-screen';
 import { Button } from '@/components/button';
@@ -16,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 
 // Figma: "Forgot Password (re)" (9:350). Title typo and red button fixed.
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const { email = '' } = useLocalSearchParams<{ email?: string }>();
   const setRecovering = useAuthStore((s) => s.setRecovering);
   const [message, setMessage] = useState<{ tone: 'error' | 'success'; text: string } | null>(null);
@@ -60,7 +62,7 @@ export default function ResetPassword() {
     setMessage(
       error
         ? { tone: 'error', text: authErrorMessage(error) }
-        : { tone: 'success', text: 'We sent a new code.' },
+        : { tone: 'success', text: t('auth.codeSent') },
     );
   };
 
@@ -68,15 +70,15 @@ export default function ResetPassword() {
     <AuthScreen
       backTo="/forgot-password"
       showLogo={false}
-      title="Reset password"
-      subtitle={`Enter the code we sent to ${email || 'your email'} and choose a new password.`}>
+      title={t('auth.resetTitle')}
+      subtitle={t('auth.resetSubtitle', { email: email || t('auth.yourEmail') })}>
       {message ? <Notice tone={message.tone} message={message.text} /> : null}
       <Controller
         control={control}
         name="code"
         render={({ field }) => (
           <TextField
-            label="Code"
+            label={t('auth.code')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -93,7 +95,7 @@ export default function ResetPassword() {
         name="password"
         render={({ field }) => (
           <TextField
-            label="New password"
+            label={t('auth.newPassword')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -109,7 +111,7 @@ export default function ResetPassword() {
         name="confirmPassword"
         render={({ field }) => (
           <TextField
-            label="Re-type new password"
+            label={t('auth.retypeNewPassword')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -121,7 +123,7 @@ export default function ResetPassword() {
           />
         )}
       />
-      <Button label="Reset password" onPress={onSubmit} loading={isSubmitting} />
+      <Button label={t('auth.resetButton')} onPress={onSubmit} loading={isSubmitting} />
       <Pressable
         accessibilityRole="button"
         disabled={cooldown.left > 0}
@@ -129,7 +131,9 @@ export default function ResetPassword() {
         className="items-center py-2">
         <Text
           className={`font-semibold text-sm ${cooldown.left > 0 ? 'text-ink-subtle' : 'text-action'}`}>
-          {cooldown.left > 0 ? `Resend code in ${cooldown.left}s` : 'Resend code'}
+          {cooldown.left > 0
+            ? t('auth.resendIn', { seconds: cooldown.left })
+            : t('auth.resendCode')}
         </Text>
       </Pressable>
     </AuthScreen>

@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 type Props = Omit<TextInputProps, 'secureTextEntry' | 'className'> & {
   label: string;
@@ -10,6 +11,7 @@ type Props = Omit<TextInputProps, 'secureTextEntry' | 'className'> & {
 };
 
 export function TextField({ label, error, secure, onFocus, onBlur, ...input }: Props) {
+  const { t } = useTranslation();
   const [hidden, setHidden] = useState(true);
   const [focused, setFocused] = useState(false);
   const border = error ? 'border-danger' : focused ? 'border-action' : 'border-line-strong';
@@ -17,7 +19,7 @@ export function TextField({ label, error, secure, onFocus, onBlur, ...input }: P
   return (
     <View className="gap-1.5">
       <Text className="font-semibold text-sm text-ink">{label}</Text>
-      <View className={`h-12 flex-row items-center rounded-lg border bg-white ${border}`}>
+      <View className={`h-12 flex-row items-center rounded-lg border bg-surface ${border}`}>
         <TextInput
           accessibilityLabel={label}
           placeholderTextColor="#8A8A8A"
@@ -38,13 +40,17 @@ export function TextField({ label, error, secure, onFocus, onBlur, ...input }: P
         {secure ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={
-              hidden ? `Show ${label.toLowerCase()}` : `Hide ${label.toLowerCase()}`
-            }
+            accessibilityLabel={t(hidden ? 'auth.show' : 'auth.hide', {
+              field: label.toLowerCase(),
+            })}
             onPress={() => setHidden((h) => !h)}
             hitSlop={8}
             className="h-full justify-center px-3">
-            <Ionicons name={hidden ? 'eye-outline' : 'eye-off-outline'} size={20} color="#5A5A5A" />
+            <Ionicons
+              name={hidden ? 'eye-outline' : 'eye-off-outline'}
+              size={20}
+              className="text-ink-muted"
+            />
           </Pressable>
         ) : null}
       </View>

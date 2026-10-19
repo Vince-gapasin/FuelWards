@@ -21,6 +21,8 @@ export type StationDetails = {
   name: string;
   address: string | null;
   brand: string | null;
+  latitude: number;
+  longitude: number;
   prices: Record<string, { price: number; reported_at: string }>;
 };
 
@@ -43,11 +45,7 @@ export function useStationDetails(stationId: string) {
     queryKey: ['station', stationId],
     queryFn: async (): Promise<StationDetails> => {
       const [station, prices] = await Promise.all([
-        supabase
-          .from('stations')
-          .select('id, name, address, brands(name)')
-          .eq('id', stationId)
-          .single(),
+        supabase.rpc('station_details', { p_station_id: stationId }).single(),
         supabase
           .from('station_latest_prices')
           .select('fuel_type, price, reported_at')
@@ -55,12 +53,9 @@ export function useStationDetails(stationId: string) {
       ]);
       if (station.error) throw station.error;
       if (prices.error) throw prices.error;
-      const brand = station.data.brands as { name: string } | { name: string }[] | null;
+      const s = station.data as Omit<StationDetails, 'prices'>;
       return {
-        id: station.data.id,
-        name: station.data.name,
-        address: station.data.address,
-        brand: Array.isArray(brand) ? (brand[0]?.name ?? null) : (brand?.name ?? null),
+        ...s,
         prices: Object.fromEntries(
           prices.data.map((p) => [
             p.fuel_type,

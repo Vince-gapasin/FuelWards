@@ -3,6 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AuthScreen } from '@/components/auth-screen';
 import { Button } from '@/components/button';
@@ -15,6 +16,7 @@ import { supabase } from '@/lib/supabase';
 
 // New screen: confirms the sign-up email with a 6-digit code (no links to open on the phone).
 export default function VerifyEmail() {
+  const { t } = useTranslation();
   const { email = '' } = useLocalSearchParams<{ email?: string }>();
   const [message, setMessage] = useState<{ tone: 'error' | 'success'; text: string } | null>(null);
   const cooldown = useCooldown(60);
@@ -45,7 +47,7 @@ export default function VerifyEmail() {
     setMessage(
       error
         ? { tone: 'error', text: authErrorMessage(error) }
-        : { tone: 'success', text: 'We sent a new code.' },
+        : { tone: 'success', text: t('auth.codeSent') },
     );
   };
 
@@ -53,15 +55,15 @@ export default function VerifyEmail() {
     <AuthScreen
       backTo="/login"
       showLogo={false}
-      title="Check your email"
-      subtitle={`Enter the 6-digit code we sent to ${email || 'your email'}.`}>
+      title={t('auth.verifyTitle')}
+      subtitle={t('auth.verifySubtitle', { email: email || t('auth.yourEmail') })}>
       {message ? <Notice tone={message.tone} message={message.text} /> : null}
       <Controller
         control={control}
         name="code"
         render={({ field }) => (
           <TextField
-            label="Code"
+            label={t('auth.code')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -74,7 +76,7 @@ export default function VerifyEmail() {
           />
         )}
       />
-      <Button label="Verify" onPress={onSubmit} loading={isSubmitting} />
+      <Button label={t('auth.verify')} onPress={onSubmit} loading={isSubmitting} />
       <Pressable
         accessibilityRole="button"
         disabled={cooldown.left > 0}
@@ -82,7 +84,9 @@ export default function VerifyEmail() {
         className="items-center py-2">
         <Text
           className={`font-semibold text-sm ${cooldown.left > 0 ? 'text-ink-subtle' : 'text-action'}`}>
-          {cooldown.left > 0 ? `Resend code in ${cooldown.left}s` : 'Resend code'}
+          {cooldown.left > 0
+            ? t('auth.resendIn', { seconds: cooldown.left })
+            : t('auth.resendCode')}
         </Text>
       </Pressable>
     </AuthScreen>

@@ -17,5 +17,8 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Light-mode defaults for the theme variables; src/theme/theme.tsx overrides them per scheme.
+    ({ addBase }) => addBase({ ':root': require('./src/theme/palette.js').light }),
+  ],
 };

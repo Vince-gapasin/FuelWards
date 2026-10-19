@@ -12,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
 import { Notice } from '@/components/notice';
@@ -32,6 +33,7 @@ import { useFuelTypes } from '@/features/stations/use-stations';
 // Figma: "Edit Price" (40:354), now for the station that was tapped (the prototype always said
 // "Updating Cleanfuel"), plus voting on other drivers' pending prices.
 export default function ReportPrices() {
+  const { t } = useTranslation();
   const { stationId } = useLocalSearchParams<{ stationId: string }>();
   const station = useStationDetails(stationId);
   const pending = usePendingReports(stationId);
@@ -54,15 +56,15 @@ export default function ReportPrices() {
     const { prices, errors } = parsePriceInputs(values);
     setFieldErrors(errors);
     if (Object.keys(errors).length) return;
-    if (!Object.keys(prices).length) return setFormError('Enter at least one price.');
+    if (!Object.keys(prices).length) return setFormError(t('report.enterOne'));
     try {
       const here = await locate();
       if (!here) throw new LocationRequiredError();
       const result = await submit.mutateAsync({ prices, at: here });
       showToast(
         result.flagged
-          ? `Thanks! +${result.pending_points} points pending. This price is unusual, so it needs extra confirmations.`
-          : `Thanks! +${result.pending_points} points pending until the price is confirmed.`,
+          ? t('report.thanksFlagged', { count: result.pending_points })
+          : t('report.thanks', { count: result.pending_points }),
       );
       close();
     } catch (e) {
@@ -79,19 +81,15 @@ export default function ReportPrices() {
       const result = await vote.mutateAsync({ reportId: report.id, vote: choice, at: here });
       if (result.status === 'verified') {
         showToast(
-          choice === 'confirm'
-            ? '+2 points! Price confirmed.'
-            : 'Price confirmed by other drivers.',
+          choice === 'confirm' ? t('report.voteConfirmed') : t('report.voteConfirmedByOthers'),
         );
       } else if (result.status === 'rejected') {
         showToast(
-          choice === 'dispute'
-            ? '+2 points! Wrong price removed.'
-            : 'Other drivers rejected this price.',
+          choice === 'dispute' ? t('report.voteRemoved') : t('report.voteRejectedByOthers'),
           'info',
         );
       } else {
-        showToast('Thanks for voting! Points arrive once the price is decided.', 'info');
+        showToast(t('report.voteThanks'), 'info');
       }
     } catch (e) {
       setFormError(reportErrorMessage(e, label));
@@ -104,21 +102,21 @@ export default function ReportPrices() {
   const mine = pending.data?.filter((r) => r.is_mine) ?? [];
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface">
       <View className="flex-row items-center justify-between border-b border-line px-4 py-2">
         <View className="flex-row items-center gap-2">
           <Ionicons name="create-outline" size={22} color="#00BF63" />
           <Text accessibilityRole="header" className="font-bold text-lg text-ink">
-            Update prices
+            {t('report.title')}
           </Text>
         </View>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel={t('common.close')}
           hitSlop={10}
           onPress={close}
           className="h-10 w-10 items-center justify-center rounded-full active:bg-sky">
-          <Ionicons name="close" size={24} color="#1D1B20" />
+          <Ionicons name="close" size={24} className="text-ink" />
         </Pressable>
       </View>
 
@@ -142,10 +140,8 @@ export default function ReportPrices() {
                 <Ionicons name="star" size={18} color="#FFFFFF" />
               </View>
               <View className="flex-1">
-                <Text className="font-bold text-base text-navy">Earn +10 points per price</Text>
-                <Text className="text-xs text-ink-muted">
-                  Points are added once other drivers confirm your price.
-                </Text>
+                <Text className="font-bold text-base text-emphasis">{t('report.earn')}</Text>
+                <Text className="text-xs text-ink-muted">{t('report.earnDetail')}</Text>
               </View>
             </View>
 
@@ -153,10 +149,8 @@ export default function ReportPrices() {
 
             {others.length ? (
               <View className="gap-2">
-                <Text className="font-semibold text-base text-ink">Is this price right?</Text>
-                <Text className="text-xs text-ink-muted">
-                  Earn +2 points when your vote matches the final result.
-                </Text>
+                <Text className="font-semibold text-base text-ink">{t('report.isRight')}</Text>
+                <Text className="text-xs text-ink-muted">{t('report.voteHint')}</Text>
                 {others.map((r) => (
                   <View key={r.id} className="gap-2 rounded-xl border border-line p-3">
                     <View className="flex-row items-center justify-between">
@@ -164,22 +158,26 @@ export default function ReportPrices() {
                         {label(r.fuel_type)} · {formatPrice(r.price)}
                       </Text>
                       <Text className="text-xs text-ink-muted">
-                        {formatAge(r.reported_at)} · {r.confirms}/{r.needed} confirms
+                        {t('report.confirms', {
+                          age: formatAge(r.reported_at),
+                          count: r.confirms,
+                          needed: r.needed,
+                        })}
                       </Text>
                     </View>
                     {r.flagged ? (
-                      <Text className="text-xs text-points">
-                        Unusual compared with nearby stations, so it needs extra confirmations.
-                      </Text>
+                      <Text className="text-xs text-points">{t('report.unusual')}</Text>
                     ) : null}
                     {r.my_vote ? (
                       <Text className="text-xs text-ink-muted">
-                        You voted {r.my_vote === 'confirm' ? '“correct”' : '“wrong”'}.
+                        {r.my_vote === 'confirm'
+                          ? t('report.youVotedCorrect')
+                          : t('report.youVotedWrong')}
                       </Text>
                     ) : (
                       <View className="flex-row gap-2">
                         <Button
-                          label="Correct"
+                          label={t('report.correct')}
                           variant="secondary"
                           className="h-10 flex-1"
                           loading={votingId === r.id && vote.variables?.vote === 'confirm'}
@@ -187,7 +185,7 @@ export default function ReportPrices() {
                           onPress={() => onVote(r, 'confirm')}
                         />
                         <Button
-                          label="Wrong"
+                          label={t('report.wrong')}
                           variant="outline"
                           className="h-10 flex-1"
                           loading={votingId === r.id && vote.variables?.vote === 'dispute'}
@@ -204,14 +202,15 @@ export default function ReportPrices() {
             {mine.length ? (
               <Notice
                 tone="info"
-                message={`Your ${mine.map((r) => `${label(r.fuel_type)} ${formatPrice(r.price)}`).join(', ')} ${
-                  mine.length === 1 ? 'is' : 'are'
-                } waiting for confirmation.`}
+                message={t('report.waiting', {
+                  count: mine.length,
+                  list: mine.map((r) => `${label(r.fuel_type)} ${formatPrice(r.price)}`).join(', '),
+                })}
               />
             ) : null}
 
             <View className="gap-3">
-              <Text className="font-semibold text-base text-ink">Report current prices</Text>
+              <Text className="font-semibold text-base text-ink">{t('report.reportCurrent')}</Text>
               {(fuelTypes.data ?? []).map((fuel) => {
                 const current = station.data?.prices[fuel.code];
                 return (
@@ -220,7 +219,9 @@ export default function ReportPrices() {
                       <View className="w-24">
                         <Text className="font-semibold text-sm text-ink">{fuel.short_label}</Text>
                         <Text className="text-[11px] text-ink-muted">
-                          {current ? `Now ${formatPrice(current.price)}` : 'No price yet'}
+                          {current
+                            ? t('report.now', { price: formatPrice(current.price) })
+                            : t('report.noPriceYet')}
                         </Text>
                       </View>
                       <View
@@ -229,7 +230,7 @@ export default function ReportPrices() {
                         }`}>
                         <Text className="font-semibold text-base text-ink">₱</Text>
                         <TextInput
-                          accessibilityLabel={`${fuel.label} price`}
+                          accessibilityLabel={t('report.priceLabel', { fuel: fuel.label })}
                           value={values[fuel.code] ?? ''}
                           onChangeText={(text) => setValues((v) => ({ ...v, [fuel.code]: text }))}
                           placeholder={current ? current.price.toFixed(2) : '0.00'}
@@ -249,14 +250,11 @@ export default function ReportPrices() {
                   </View>
                 );
               })}
-              <Text className="text-xs text-ink-muted">
-                Fill in only the prices you can see on the station’s price board. We use your
-                location to check you’re at the station.
-              </Text>
+              <Text className="text-xs text-ink-muted">{t('report.hint')}</Text>
             </View>
 
             <Button
-              label="Submit prices"
+              label={t('report.submit')}
               variant="secondary"
               onPress={onSubmit}
               loading={submit.isPending}

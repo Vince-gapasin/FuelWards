@@ -1,11 +1,12 @@
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 
+import { useThemeColors } from '@/theme/theme';
 type Variant = 'primary' | 'secondary' | 'outline';
 
 const containers: Record<Variant, string> = {
   primary: 'bg-action active:bg-navy-600',
   secondary: 'bg-brand active:bg-brand-light',
-  outline: 'border border-line-strong bg-white active:bg-sky',
+  outline: 'border border-line-strong bg-surface active:bg-sky',
 };
 
 const labels: Record<Variant, string> = {
@@ -31,6 +32,7 @@ export function Button({
   disabled,
   className,
 }: Props) {
+  const theme = useThemeColors();
   const inactive = disabled || loading;
   return (
     <Pressable
@@ -41,7 +43,7 @@ export function Button({
       disabled={inactive}
       className={`h-12 flex-row items-center justify-center rounded-xl px-6 ${containers[variant]} ${inactive ? 'opacity-50' : ''} ${className ?? ''}`}>
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? '#1D1B20' : '#FFFFFF'} />
+        <ActivityIndicator color={variant === 'outline' ? theme.ink : '#FFFFFF'} />
       ) : (
         <Text className={`font-semibold text-base ${labels[variant]}`}>{label}</Text>
       )}

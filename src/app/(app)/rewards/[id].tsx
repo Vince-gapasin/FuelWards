@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
 import { Notice } from '@/components/notice';
@@ -13,6 +14,7 @@ import { useRedeem, useRewards } from '@/features/rewards/api';
 import { rewardErrorMessage } from '@/features/rewards/format';
 
 export default function RewardDetail() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const rewards = useRewards();
   const profile = useProfile();
@@ -30,7 +32,7 @@ export default function RewardDetail() {
     setError(null);
     try {
       const result = await redeem.mutateAsync(id);
-      showToast(`Redeemed! Your code is ${result.code}.`);
+      showToast(t('rewards.redeemed', { code: result.code }));
       router.replace(`/vouchers/${result.id}`);
     } catch (e) {
       setConfirming(false);
@@ -39,18 +41,18 @@ export default function RewardDetail() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScreenHeader title="Reward" fallback="/rewards" />
+    <SafeAreaView className="flex-1 bg-surface">
+      <ScreenHeader title={t('rewards.reward')} fallback="/rewards" />
       <ScrollView contentContainerClassName="px-6 py-6">
         <View className="w-full max-w-md gap-5 self-center">
           {rewards.isPending ? <ActivityIndicator color="#007BFF" /> : null}
           {rewards.isSuccess && !reward ? (
-            <Notice tone="error" message="This reward isn’t available any more." />
+            <Notice tone="error" message={t('rewards.unavailable')} />
           ) : null}
           {reward ? (
             <>
               <View className="items-center gap-3 rounded-2xl bg-sky p-6">
-                <View className="h-14 w-14 items-center justify-center rounded-full bg-white">
+                <View className="h-14 w-14 items-center justify-center rounded-full bg-surface">
                   <Ionicons name="pricetag" size={26} color="#007BFF" />
                 </View>
                 <Text
@@ -58,7 +60,9 @@ export default function RewardDetail() {
                   className="text-center font-bold text-2xl text-ink">
                   {reward.title}
                 </Text>
-                <Text className="font-bold text-xl text-points">{reward.cost_points} points</Text>
+                <Text className="font-bold text-xl text-points">
+                  {t('common.points', { count: reward.cost_points })}
+                </Text>
               </View>
 
               {reward.description ? (
@@ -66,40 +70,42 @@ export default function RewardDetail() {
               ) : null}
               <View className="gap-1">
                 {reward.partner ? (
-                  <Text className="text-sm text-ink-muted">Partner: {reward.partner}</Text>
+                  <Text className="text-sm text-ink-muted">
+                    {t('rewards.partner', { name: reward.partner })}
+                  </Text>
                 ) : null}
                 {reward.stock != null ? (
                   <Text className="text-sm text-ink-muted">
-                    {soldOut ? 'Sold out' : `${reward.stock} left`}
+                    {soldOut ? t('rewards.soldOut') : t('rewards.left', { count: reward.stock })}
                   </Text>
                 ) : null}
+                <Text className="text-sm text-ink-muted">{t('rewards.validity')}</Text>
                 <Text className="text-sm text-ink-muted">
-                  Valid for 30 days after you redeem it.
+                  {t('rewards.youHave', { count: balance })}
                 </Text>
-                <Text className="text-sm text-ink-muted">You have {balance} points.</Text>
               </View>
 
               {error ? <Notice tone="error" message={error} /> : null}
 
               {soldOut ? (
-                <Button label="Sold out" disabled />
+                <Button label={t('rewards.soldOut')} disabled />
               ) : short > 0 ? (
-                <Button label={`${short} more points needed`} disabled />
+                <Button label={t('rewards.moreNeeded', { count: short })} disabled />
               ) : confirming ? (
                 <View className="gap-3 rounded-2xl border border-line p-4">
                   <Text className="text-center text-base text-ink">
-                    Spend {reward.cost_points} of your {balance} points on this reward?
+                    {t('rewards.confirmSpend', { cost: reward.cost_points, balance })}
                   </Text>
                   <View className="flex-row gap-2">
                     <Button
-                      label="Cancel"
+                      label={t('common.cancel')}
                       variant="outline"
                       className="flex-1"
                       onPress={() => setConfirming(false)}
                       disabled={redeem.isPending}
                     />
                     <Button
-                      label="Redeem"
+                      label={t('rewards.redeem')}
                       variant="secondary"
                       className="flex-1"
                       onPress={onRedeem}
@@ -109,7 +115,7 @@ export default function RewardDetail() {
                 </View>
               ) : (
                 <Button
-                  label={`Redeem for ${reward.cost_points} points`}
+                  label={t('rewards.redeemFor', { count: reward.cost_points })}
                   variant="secondary"
                   onPress={() => setConfirming(true)}
                 />

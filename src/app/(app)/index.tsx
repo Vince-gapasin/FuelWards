@@ -12,14 +12,18 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Logo } from '@/components/logo';
 import { Notice } from '@/components/notice';
+import { OfflineBanner } from '@/components/offline-banner';
+import { useUnreadAlertCount } from '@/features/alerts/api';
 import { useProfile } from '@/features/auth/use-profile';
 import { useUserLocation } from '@/features/location/use-location';
 import { StationMap } from '@/features/map/station-map';
 import { FOCUS_ZOOM, type StationMapHandle } from '@/features/map/types';
 import { sortStations } from '@/features/stations/format';
+import { DoeBanner } from '@/features/doe/doe-banner';
 import { FuelChips } from '@/features/stations/fuel-chips';
 import { SearchBar } from '@/features/stations/search-bar';
 import { StationCard } from '@/features/stations/station-card';
@@ -32,6 +36,7 @@ const CARD_GAP = 12;
 
 // Figma: "Home Page" (35:150) and the five station pages, now one data-driven screen.
 export default function Home() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const cardWidth = Math.min(width - 64, 340);
 
@@ -47,6 +52,7 @@ export default function Home() {
   const scrollToSelection = useRef(false);
 
   const profile = useProfile();
+  const unreadAlerts = useUnreadAlertCount();
   const fuelTypes = useFuelTypes();
   const nearby = useNearbyStations(queryCenter);
   const stations = useMemo(
@@ -92,8 +98,8 @@ export default function Home() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <SafeAreaView edges={['top']} className="z-20 bg-white">
+    <View className="flex-1 bg-surface">
+      <SafeAreaView edges={['top']} className="z-20 bg-surface">
         <View className="flex-row items-center justify-between border-b border-line px-3 py-1.5">
           <View className="flex-row items-center gap-1.5">
             <Logo size={34} />
@@ -104,7 +110,7 @@ export default function Home() {
           <View className="flex-row items-center gap-2">
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={`${profile.data?.points ?? 0} points. Open rewards`}
+              accessibilityLabel={t('home.pointsBadge', { count: profile.data?.points ?? 0 })}
               onPress={() => router.push('/rewards')}
               className="flex-row items-center gap-1.5 rounded-full border border-line px-3 py-1.5 active:bg-sky">
               <Ionicons name="star" size={15} color="#FFDF00" />
@@ -112,10 +118,24 @@ export default function Home() {
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Account"
+              accessibilityLabel={
+                unreadAlerts.data
+                  ? t('home.alertsNew', { count: unreadAlerts.data })
+                  : t('home.alerts')
+              }
+              onPress={() => router.push('/alerts')}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-sky">
+              <Ionicons name="notifications-outline" size={24} className="text-emphasis" />
+              {unreadAlerts.data ? (
+                <View className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border border-white bg-danger-bright" />
+              ) : null}
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('home.account')}
               onPress={() => router.push('/account')}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-sky">
-              <Ionicons name="person-circle-outline" size={28} color="#011D39" />
+              <Ionicons name="person-circle-outline" size={28} className="text-emphasis" />
             </Pressable>
           </View>
         </View>
@@ -157,17 +177,16 @@ export default function Home() {
             sort={sort}
             onToggleSort={() => setSort((s) => (s === 'nearest' ? 'cheapest' : 'nearest'))}
           />
+          <OfflineBanner />
+          <DoeBanner fuelTypes={fuelTypes.data ?? []} />
           {locationStatus === 'denied' ? (
             <View className="mx-3">
-              <Notice
-                tone="info"
-                message="Location is off, so you're seeing Santa Mesa. Allow location in your settings to see stations near you."
-              />
+              <Notice tone="info" message={t('home.locationOff')} />
             </View>
           ) : null}
           {nearby.isError ? (
             <View className="mx-3">
-              <Notice tone="error" message="Couldn't load stations. Check your connection." />
+              <Notice tone="error" message={t('home.loadFailed')} />
             </View>
           ) : null}
         </View>
@@ -175,15 +194,15 @@ export default function Home() {
         <View className="absolute bottom-0 left-0 right-0 gap-3 pb-4" pointerEvents="box-none">
           <View className="flex-row items-center justify-end gap-2 px-3" pointerEvents="box-none">
             {nearby.isFetching ? (
-              <View className="rounded-full bg-white px-3 py-1.5 shadow-sm">
+              <View className="rounded-full bg-surface px-3 py-1.5 shadow-sm">
                 <ActivityIndicator size="small" color="#007BFF" />
               </View>
             ) : null}
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Show my location"
+              accessibilityLabel={t('home.showMyLocation')}
               onPress={onLocate}
-              className="h-12 w-12 items-center justify-center rounded-full border border-line bg-white shadow-md active:bg-sky">
+              className="h-12 w-12 items-center justify-center rounded-full border border-line bg-surface shadow-md active:bg-sky">
               {locationStatus === 'locating' ? (
                 <ActivityIndicator color="#00BF63" />
               ) : (
@@ -193,10 +212,8 @@ export default function Home() {
           </View>
 
           {nearby.isSuccess && stations.length === 0 ? (
-            <View className="mx-3 rounded-2xl bg-white p-4 shadow-md">
-              <Text className="text-sm text-ink">
-                No stations within 5 km. Move the map to look in another area.
-              </Text>
+            <View className="mx-3 rounded-2xl bg-surface p-4 shadow-md">
+              <Text className="text-sm text-ink">{t('home.noStations')}</Text>
             </View>
           ) : (
             <FlatList

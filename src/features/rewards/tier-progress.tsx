@@ -1,4 +1,5 @@
 import { Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { tierLabel, tierProgress, type Tier } from './format';
 
@@ -6,6 +7,7 @@ type Props = { tier: string; lifetime: number; tiers: Tier[]; dark?: boolean };
 
 /** Tier name plus a bar showing progress to the next tier ("120 more points to Gold"). */
 export function TierProgress({ tier, lifetime, tiers, dark }: Props) {
+  const { t } = useTranslation();
   const { fraction, toNext, next } = tierProgress(lifetime, tiers);
   return (
     <View className="w-full gap-1.5">
@@ -14,7 +16,7 @@ export function TierProgress({ tier, lifetime, tiers, dark }: Props) {
           {tierLabel(tier)}
         </Text>
         <Text className={`text-xs ${dark ? 'text-white/70' : 'text-ink-muted'}`}>
-          {next ? `${toNext} more points to ${next}` : 'Top tier'}
+          {next ? t('tiers.toNext', { count: toNext ?? 0, tier: next }) : t('tiers.top')}
         </Text>
       </View>
       <View

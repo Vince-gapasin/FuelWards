@@ -1,8 +1,13 @@
 import { Stack } from 'expo-router';
 
+import { useAlertNotificationTaps } from '@/features/alerts/push';
+import { useThemeColors } from '@/theme/theme';
+
 export default function AppLayout() {
+  const theme = useThemeColors();
+  useAlertNotificationTaps();
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.surface } }}>
       <Stack.Screen name="report/[stationId]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="rewards/index" options={{ presentation: 'modal' }} />
     </Stack>

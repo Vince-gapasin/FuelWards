@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AuthScreen } from '@/components/auth-screen';
 import { Button } from '@/components/button';
@@ -12,17 +13,17 @@ import { TextField } from '@/components/text-field';
 import { TextLink } from '@/components/text-link';
 import { setStayLoggedIn } from '@/features/auth/auth-store';
 import { authErrorMessage } from '@/features/auth/errors';
-import { notConfiguredMessage } from '@/features/auth/not-configured';
 import { loginSchema, type LoginValues } from '@/features/auth/schemas';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
 
 const notices = {
-  'password-changed': 'Password changed! Log in with your new password.',
+  'password-changed': 'auth.passwordChanged',
 } as const;
 
 // Figma: "Login" (9:106) and "Password Changed (relog)" (9:465). "Account Created (Login)" (9:251)
 // is replaced by the verify-email code screen, which signs the new user straight in.
 export default function Login() {
+  const { t } = useTranslation();
   const { notice, email } = useLocalSearchParams<{
     notice?: keyof typeof notices;
     email?: string;
@@ -39,7 +40,7 @@ export default function Login() {
 
   const onSubmit = handleSubmit(async ({ email, password, stayLoggedIn }) => {
     setFormError(null);
-    if (!supabaseConfigured) return setFormError(notConfiguredMessage);
+    if (!supabaseConfigured) return setFormError(t('auth.notConfigured'));
     try {
       await setStayLoggedIn(stayLoggedIn);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -55,7 +56,7 @@ export default function Login() {
     }
   });
 
-  const banner = notice && notices[notice];
+  const banner = notice && notices[notice] && t(notices[notice]);
 
   return (
     <AuthScreen backTo="/welcome">
@@ -67,7 +68,7 @@ export default function Login() {
         name="email"
         render={({ field }) => (
           <TextField
-            label="Email"
+            label={t('auth.email')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -84,7 +85,7 @@ export default function Login() {
         name="password"
         render={({ field }) => (
           <TextField
-            label="Password"
+            label={t('auth.password')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -101,17 +102,21 @@ export default function Login() {
         control={control}
         name="stayLoggedIn"
         render={({ field }) => (
-          <Checkbox checked={field.value} onChange={field.onChange} label="Stay logged in" />
+          <Checkbox
+            checked={field.value}
+            onChange={field.onChange}
+            label={t('auth.stayLoggedIn')}
+          />
         )}
       />
 
-      <Button label="Log in" onPress={onSubmit} loading={isSubmitting} className="mt-2" />
+      <Button label={t('auth.logIn')} onPress={onSubmit} loading={isSubmitting} className="mt-2" />
 
       <View className="items-center gap-3">
-        <TextLink href="/forgot-password" label="Forgot password?" />
+        <TextLink href="/forgot-password" label={t('auth.forgotPassword')} />
         <View className="flex-row items-center gap-1">
-          <Text className="text-sm text-ink-muted">New to FuelWards?</Text>
-          <TextLink href="/sign-up" label="Create an account" replace />
+          <Text className="text-sm text-ink-muted">{t('auth.newHere')}</Text>
+          <TextLink href="/sign-up" label={t('auth.createAccount')} replace />
         </View>
       </View>
     </AuthScreen>

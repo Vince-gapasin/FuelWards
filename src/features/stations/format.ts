@@ -1,4 +1,5 @@
 import type { SortMode, Station } from './types';
+import i18n from '@/i18n';
 
 const peso = new Intl.NumberFormat('en-PH', {
   style: 'currency',
@@ -35,12 +36,11 @@ export function brandCode(brand: string | null): string {
 /** "Updated 3 h ago" style freshness for a price timestamp. */
 export function formatAge(iso: string, now: Date = new Date()): string {
   const minutes = Math.max(0, Math.round((now.getTime() - new Date(iso).getTime()) / 60_000));
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes} min ago`;
+  if (minutes < 1) return i18n.t('age.justNow');
+  if (minutes < 60) return i18n.t('age.minutes', { count: minutes });
   const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours} h ago`;
-  const days = Math.round(hours / 24);
-  return days === 1 ? '1 day ago' : `${days} days ago`;
+  if (hours < 24) return i18n.t('age.hours', { count: hours });
+  return i18n.t('age.days', { count: Math.round(hours / 24) });
 }
 
 export function priceFor(station: Station, fuel: string): number | undefined {

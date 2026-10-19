@@ -61,6 +61,33 @@ The app never writes prices or points itself. It calls database functions (`supa
 
 Every number above lives in the `app_config` table. For a demo away from a real station, raise `max_report_distance_m` and `max_vote_distance_m` there, and put them back afterwards.
 
+## Price alerts and notifications
+
+Drivers set alerts on the Price alerts screen, for example "Diesel at or below ₱58 within 3 km" or "at one saved station". Each driver can have up to 10. When a price becomes verified, a database trigger matches it against active alerts and adds a row to that driver's inbox. The same alert won't fire again for the same station within 12 hours. A pg_cron job (`fuelwards-alert-pushes`, every 5 minutes) then sends the new matches through the Expo push service.
+
+The inbox works everywhere. Phone notifications need two things this repo can't do for you:
+
+1. An Expo project id. Run `npx eas-cli init` once. It adds `extra.eas.projectId` to `app.json`. Until then, the alerts screen says notifications aren't set up.
+2. A development build on a real phone. Push notifications don't work in Expo Go, on web or in emulators without Google Play.
+
+## DOE weekly bulletin
+
+The home screen shows the Department of Energy's weekly price adjustment when one is on file for the current week. It shows bulletins from up to 6 days ago through up to 7 days ahead. There's no admin screen yet (Phase 6), so add each week's bulletin in the Supabase SQL editor. Use one row per fuel, with peso-per-litre changes (negative for rollbacks):
+
+```sql
+insert into public.doe_bulletins (effective_date, fuel_type, change_min, change_max, source_url) values
+  ('2026-10-20', 'GAS91',  0.90, 1.10, 'https://doe.gov.ph/...'),
+  ('2026-10-20', 'DIESEL', -0.50, -0.30, 'https://doe.gov.ph/...');
+```
+
+Fuel codes are `GAS91`, `GAS95`, `GAS97`, `DIESEL`, `DIESEL_PLUS` and `KEROSENE`. `region` defaults to `NCR`.
+
+## Offline, languages and dark mode
+
+- **Offline:** stations, prices, favorites and your points are saved on the device for 24 hours. With no connection, the app shows the saved data under a banner. Reporting and voting still need a connection.
+- **Languages:** English and Filipino. By default the app follows the phone's language, and Profile → Language overrides it. Strings live in `src/i18n/en.ts` and `src/i18n/fil.ts`. A unit test fails if the Filipino file is missing a key or a `{{placeholder}}`.
+- **Dark mode:** by default the app follows the phone, and Profile → Appearance overrides it. Theme colours are CSS variables in `src/theme/palette.js`. Use the Tailwind names (`bg-surface`, `text-ink`, `border-line`…) rather than hex values, so screens switch automatically.
+
 ## Database
 
 Schema, security rules and seed data live in `supabase/`. Running Supabase locally requires Docker Desktop.

@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 // Matches the server check in submit_price_report (price > 20 and < 300).
 export const MIN_PRICE = 20;
 export const MAX_PRICE = 300;
@@ -17,12 +19,12 @@ export function parsePriceInputs(values: Record<string, string>): ParsedPrices {
     const text = raw.trim().replace(/^₱\s*/, '').replace(',', '.');
     if (!text) continue;
     if (!/^\d{1,3}(\.\d{1,2})?$/.test(text)) {
-      errors[code] = 'Use a price like 61.25';
+      errors[code] = i18n.t('validation.priceFormat');
       continue;
     }
     const price = Number(text);
     if (price <= MIN_PRICE || price >= MAX_PRICE) {
-      errors[code] = `Must be between ₱${MIN_PRICE} and ₱${MAX_PRICE}`;
+      errors[code] = i18n.t('validation.priceRange', { min: MIN_PRICE, max: MAX_PRICE });
       continue;
     }
     prices[code] = price;

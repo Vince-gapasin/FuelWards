@@ -1,8 +1,10 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
+import { useAuthStore } from '@/features/auth/auth-store';
 import { supabase } from '@/lib/supabase';
 
+import type { PricePoint } from './chart';
 import type { FuelType, LatLng, Station } from './types';
 
 const NEARBY_RADIUS_M = 5000;
@@ -75,5 +77,73 @@ export function useStationSearch(query: string, near: LatLng | null) {
       if (error) throw error;
       return data as Station[];
     },
+  });
+}
+
+/** Daily confirmed prices for the last 30 days, grouped by fuel code. */
+export function usePriceHistory(stationId: string) {
+  return useQuery({
+    queryKey: ['price-history', stationId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('station_price_history', {
+        p_station_id: stationId,
+        p_days: 30,
+      });
+      if (error) throw error;
+      const byFuel: Record<string, PricePoint[]> = {};
+      for (const row of data as { fuel_type: string; day: string; price: number }[]) {
+        (byFuel[row.fuel_type] ??= []).push({ day: row.day, price: Number(row.price) });
+      }
+      return byFuel;
+    },
+  });
+}
+
+/** IDs of the stations the user saved. */
+export function useFavoriteIds() {
+  const userId = useAuthStore((s) => s.session?.user.id);
+  return useQuery({
+    queryKey: ['favorites', 'ids', userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('favorites').select('station_id');
+      if (error) throw error;
+      return new Set(data.map((f) => f.station_id as string));
+    },
+  });
+}
+
+export function useFavoriteStations(near: LatLng | null) {
+  const userId = useAuthStore((s) => s.session?.user.id);
+  return useQuery({
+    queryKey: [
+      'favorites',
+      'stations',
+      userId,
+      near && round(near.latitude),
+      near && round(near.longitude),
+    ],
+    enabled: Boolean(userId && near),
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('favorite_stations', {
+        lat: near!.latitude,
+        lng: near!.longitude,
+      });
+      if (error) throw error;
+      return data as Station[];
+    },
+  });
+}
+
+export function useToggleFavorite() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ stationId, save }: { stationId: string; save: boolean }) => {
+      const { error } = save
+        ? await supabase.from('favorites').insert({ station_id: stationId })
+        : await supabase.from('favorites').delete().eq('station_id', stationId);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['favorites'] }),
   });
 }

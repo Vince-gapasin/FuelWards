@@ -1,8 +1,10 @@
+import i18n from '@/i18n';
+
 export type Tier = { name: string; min: number };
 
 /** "Gold Contributor", the rank label from the prototype's points panel. */
 export function tierLabel(tier: string | null | undefined): string {
-  return `${tier ?? 'Bronze'} Contributor`;
+  return i18n.t('tiers.label', { tier: tier ?? 'Bronze' });
 }
 
 /**
@@ -26,12 +28,12 @@ export function tierProgress(
 
 export type VoucherState = 'active' | 'used' | 'expired' | 'cancelled';
 
-/** Badge colours (Tailwind classes) for each voucher state. */
+/** Badge colours (Tailwind classes) for each voucher state; labels are vouchers.states.* */
 export const voucherStateStyles = {
-  active: { label: 'Active', box: 'bg-brand/15', text: 'text-brand' },
-  used: { label: 'Used', box: 'bg-line/60', text: 'text-ink-muted' },
-  expired: { label: 'Expired', box: 'bg-line/60', text: 'text-ink-muted' },
-  cancelled: { label: 'Cancelled', box: 'bg-line/60', text: 'text-ink-muted' },
+  active: { box: 'bg-brand/15', text: 'text-brand' },
+  used: { box: 'bg-line/60', text: 'text-ink-muted' },
+  expired: { box: 'bg-line/60', text: 'text-ink-muted' },
+  cancelled: { box: 'bg-line/60', text: 'text-ink-muted' },
 } as const;
 
 export function voucherState(
@@ -45,14 +47,14 @@ export function voucherState(
 }
 
 const reasons: Record<string, string> = {
-  report_verified: 'Price confirmed',
-  vote_matched: 'Helpful vote',
-  reward_redeemed: 'Reward redeemed',
+  report_verified: 'profile.reasons.reportVerified',
+  vote_matched: 'profile.reasons.voteMatched',
+  reward_redeemed: 'profile.reasons.rewardRedeemed',
 };
 
 /** Label for a points-ledger entry. */
 export function reasonLabel(reason: string): string {
-  return reasons[reason] ?? 'Adjustment';
+  return i18n.t(reasons[reason] ?? 'profile.reasons.other');
 }
 
 const dateFormat = new Intl.DateTimeFormat('en-PH', {
@@ -68,21 +70,22 @@ export function formatDate(iso: string): string {
 
 /** Message for a failed redemption (codes from the redeem_reward function). */
 export function rewardErrorMessage(error: unknown): string {
+  const t = i18n.t.bind(i18n);
   const e = (error ?? {}) as { message?: string; details?: string | null };
   switch (e.message) {
     case 'not_enough_points':
       return e.details
-        ? `You need ${e.details} more points for this reward.`
-        : 'You don’t have enough points for this reward.';
+        ? t('rewards.errors.notEnough', { count: Number(e.details) })
+        : t('rewards.errors.notEnoughGeneric');
     case 'out_of_stock':
-      return 'This reward just ran out.';
+      return t('rewards.errors.outOfStock');
     case 'reward_unavailable':
-      return 'This reward isn’t available any more.';
+      return t('rewards.unavailable');
     case 'not_signed_in':
-      return 'Your session expired. Log in again.';
+      return t('common.sessionExpired');
   }
   if (error instanceof TypeError || /fetch|network/i.test(e.message ?? '')) {
-    return 'Can’t reach the server. Check your connection and try again.';
+    return t('common.networkError');
   }
-  return 'Something went wrong. Please try again.';
+  return t('common.genericError');
 }

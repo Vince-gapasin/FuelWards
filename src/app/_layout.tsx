@@ -8,7 +8,7 @@ import {
   Inter_900Black,
 } from '@expo-google-fonts/inter';
 import { LilitaOne_400Regular } from '@expo-google-fonts/lilita-one';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,7 +17,12 @@ import { useEffect, useState } from 'react';
 
 import { ToastHost } from '@/components/toast';
 import { useAuthListener, useAuthStore, useIsSignedIn } from '@/features/auth/auth-store';
-import { createQueryClient } from '@/lib/query-client';
+import { applyLanguagePreference, loadLanguagePreference } from '@/i18n';
+import { CACHE_MAX_AGE, createQueryClient, queryPersister } from '@/lib/query-client';
+import { ThemeRoot, useThemeColors } from '@/theme/theme';
+
+// Queries that are only useful fresh are not saved for offline use.
+const NOT_PERSISTED = new Set(['pending-reports', 'alerts', 'leaderboard']);
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,7 +38,14 @@ export default function RootLayout() {
   });
   useAuthListener();
   const authReady = useAuthStore((s) => s.initialized);
-  const ready = (fontsLoaded || Boolean(fontError)) && authReady;
+  // Apply the saved language before the first screen, so it never flashes in English.
+  const [languageReady, setLanguageReady] = useState(false);
+  useEffect(() => {
+    loadLanguagePreference()
+      .then(applyLanguagePreference)
+      .finally(() => setLanguageReady(true));
+  }, []);
+  const ready = (fontsLoaded || Boolean(fontError)) && authReady && languageReady;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
@@ -42,18 +54,35 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <StatusBar style="dark" />
-      <RootNavigator />
-      <ToastHost />
-    </QueryClientProvider>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister: queryPersister,
+        maxAge: CACHE_MAX_AGE,
+        dehydrateOptions: {
+          shouldDehydrateQuery: (q) =>
+            q.state.status === 'success' && !NOT_PERSISTED.has(String(q.queryKey[0])),
+        },
+      }}>
+      <ThemeRoot>
+        <ThemedStatusBar />
+        <RootNavigator />
+        <ToastHost />
+      </ThemeRoot>
+    </PersistQueryClientProvider>
   );
 }
 
+function ThemedStatusBar() {
+  const { dark } = useThemeColors();
+  return <StatusBar style={dark ? 'light' : 'dark'} />;
+}
+
 function RootNavigator() {
+  const theme = useThemeColors();
   const signedIn = useIsSignedIn();
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.surface } }}>
       <Stack.Protected guard={signedIn} redirectTo="/welcome">
         <Stack.Screen name="(app)" />
       </Stack.Protected>
