@@ -18,6 +18,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run format:check
+      - run: npm test
       - run: npm run build:web
 
   database:
@@ -29,5 +30,6 @@ jobs:
           version: latest
       # Applies every migration and seed.sql on a fresh local Postgres, then runs pgTAP tests.
       - run: supabase start
-      - run: supabase db lint --fail-on error
+      # Only our schema: PostGIS's own functions in `extensions` trip the linter.
+      - run: supabase db lint --schema public --fail-on error
       - run: supabase test db
