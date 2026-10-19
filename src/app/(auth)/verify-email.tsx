@@ -83,7 +83,7 @@ export default function VerifyEmail() {
         onPress={resend}
         className="items-center py-2">
         <Text
-          className={`font-semibold text-sm ${cooldown.left > 0 ? 'text-ink-subtle' : 'text-action'}`}>
+          className={`font-semibold text-sm ${cooldown.left > 0 ? 'text-ink-subtle' : 'text-link'}`}>
           {cooldown.left > 0
             ? t('auth.resendIn', { seconds: cooldown.left })
             : t('auth.resendCode')}

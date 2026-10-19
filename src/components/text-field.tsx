@@ -55,7 +55,7 @@ export function TextField({ label, error, secure, onFocus, onBlur, ...input }: P
         ) : null}
       </View>
       {error ? (
-        <Text accessibilityRole="alert" className="text-sm text-danger">
+        <Text accessibilityRole="alert" className="text-sm text-critical">
           {error}
         </Text>
       ) : null}

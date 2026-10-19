@@ -155,6 +155,7 @@ export function useMarkAlertsRead() {
 export function alertErrorMessage(error: unknown): string {
   const e = (error ?? {}) as { message?: string; code?: string };
   if (e.message === 'too_many_alerts') return i18n.t('alerts.errors.tooMany');
+  if (e.message === 'banned') return i18n.t('common.banned');
   if (e.code === '23514') return i18n.t('alerts.errors.needArea');
   if (e.code === '23503') return i18n.t('alerts.errors.unavailable');
   return i18n.t('alerts.errors.generic');

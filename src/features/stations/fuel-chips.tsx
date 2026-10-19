@@ -24,6 +24,7 @@ export function FuelChips({ fuelTypes, selected, onSelect, sort, onToggleSort }:
         accessibilityRole="button"
         accessibilityLabel={t('sort.label', { mode: t(`sort.${sort}`) })}
         onPress={onToggleSort}
+        hitSlop={{ top: 6, bottom: 6 }}
         className="h-8 flex-row items-center gap-1 rounded-full bg-navy px-3 active:bg-navy-600">
         <Ionicons
           name={sort === 'nearest' ? 'navigate-outline' : 'pricetag-outline'}
@@ -41,6 +42,7 @@ export function FuelChips({ fuelTypes, selected, onSelect, sort, onToggleSort }:
             aria-checked={active}
             accessibilityLabel={fuel.label}
             onPress={() => onSelect(fuel.code)}
+            hitSlop={{ top: 6, bottom: 6 }}
             className={`h-8 justify-center rounded-full border px-3 ${
               active ? 'border-action bg-action' : 'border-line bg-surface active:bg-sky'
             }`}>

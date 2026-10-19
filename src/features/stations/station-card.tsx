@@ -52,7 +52,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
               <Text numberOfLines={1} className="flex-shrink font-bold text-lg text-ink">
                 {station.name}
               </Text>
-              {selected ? <Ionicons name="chevron-forward" size={16} color="#007BFF" /> : null}
+              {selected ? <Ionicons name="chevron-forward" size={16} color="#0066D6" /> : null}
             </View>
             <Text numberOfLines={1} className="text-xs text-ink-muted">
               {[station.address, formatDistance(station.distance_m)].filter(Boolean).join(' · ')}
@@ -64,7 +64,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
               newest ? t('card.pricesUpdated', { age: formatAge(newest) }) : t('card.noPrices')
             }>
             <Text
-              className={`font-semibold text-[10px] ${newest ? 'text-brand' : 'text-ink-muted'}`}>
+              className={`font-semibold text-xs ${newest ? 'text-positive' : 'text-ink-muted'}`}>
               {newest ? t('card.updated', { age: formatAge(newest) }) : t('card.noPrices')}
             </Text>
           </View>
@@ -76,7 +76,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
               key={code}
               className={`flex-1 items-center ${i > 0 ? 'border-l border-line' : ''}`}>
               <Text
-                className={`text-[10px] ${code === selectedFuel ? 'font-bold text-action' : 'text-ink-muted'}`}>
+                className={`text-xs ${code === selectedFuel ? 'font-bold text-link' : 'text-ink-muted'}`}>
                 {label(code)}
               </Text>
               <Text className="font-bold text-sm text-ink">
@@ -93,7 +93,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
           onPress={() => router.push(`/report/${station.id}`)}
           className="flex-row items-center gap-1.5 self-start rounded-full bg-star/30 px-2.5 py-1 active:bg-star/50">
           <Ionicons name="help-circle" size={13} className="text-emphasis" />
-          <Text className="font-semibold text-[11px] text-emphasis">
+          <Text className="font-semibold text-xs text-emphasis">
             {t('card.toConfirm', { count: station.pending_count })}
           </Text>
         </Pressable>
@@ -103,6 +103,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
         <Pressable
           accessibilityRole="link"
           onPress={() => Linking.openURL(directionsUrl(station))}
+          hitSlop={{ top: 4, bottom: 4 }}
           className="h-9 flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-navy active:bg-navy-600">
           <Ionicons name="navigate" size={14} color="#FFFFFF" />
           <Text className="font-semibold text-sm text-white">{t('card.directions')}</Text>
@@ -110,6 +111,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
         <Pressable
           accessibilityRole="button"
           onPress={() => router.push(`/report/${station.id}`)}
+          hitSlop={{ top: 4, bottom: 4 }}
           className="h-9 flex-1 flex-row items-center justify-center gap-1.5 rounded-lg border border-line-strong bg-surface active:bg-sky">
           <Ionicons name="add" size={16} className="text-emphasis" />
           <Text className="font-semibold text-sm text-emphasis">{t('card.updatePrice')}</Text>

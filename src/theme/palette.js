@@ -10,6 +10,9 @@ module.exports = {
     '--line': '217 217 217',
     '--line-strong': '179 179 179',
     '--emphasis': '1 29 57',
+    '--link': '0 102 214',
+    '--positive': '0 128 70',
+    '--critical': '187 0 0',
   },
   dark: {
     '--surface': '17 20 24',
@@ -20,5 +23,8 @@ module.exports = {
     '--line': '44 50 58',
     '--line-strong': '73 81 92',
     '--emphasis': '156 194 255',
+    '--link': '120 178 255',
+    '--positive': '0 191 99',
+    '--critical': '255 128 128',
   },
 };

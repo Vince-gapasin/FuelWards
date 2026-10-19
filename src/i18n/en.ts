@@ -15,6 +15,8 @@ export const en = {
     points_other: '{{count}} points',
     pts: '{{count}} pts',
     logo: 'Fuel Rewards logo',
+    banned:
+      'Your account is suspended from reporting, voting and rewards. Contact the FuelWards team if you think this is a mistake.',
   },
   age: {
     justNow: 'just now',
@@ -287,7 +289,20 @@ export const en = {
       vouchers: 'My vouchers',
       leaderboard: 'Leaderboard',
       privacy: 'Privacy Notice',
+      admin: 'Admin console',
     },
+    yourData: 'Your data',
+    download: 'Download my data',
+    downloadHint: 'A copy of your account, reports, points and vouchers as a JSON file.',
+    downloadFailed: 'Couldn’t prepare your data. Try again.',
+    delete: 'Delete my account',
+    deleteWarning:
+      'This permanently deletes your account, points, vouchers, saved stations and alerts. Prices you reported that were already confirmed stay on the map without your name. Prices still waiting are removed.',
+    deleteConfirmLabel: 'Type {{username}} to confirm',
+    deleteConfirm: 'Delete permanently',
+    deleteFailed: 'Couldn’t delete your account. Try again.',
+    deleteLastAdmin: 'Make another user an admin before deleting the last admin account.',
+    deleted: 'Your account was deleted.',
     appearance: 'Appearance',
     system: 'System',
     light: 'Light',
@@ -346,18 +361,24 @@ export const en = {
   },
   privacy: {
     title: 'Privacy Notice',
+    consentTitle: 'Before you continue',
+    consentBody:
+      'FuelWards uses your location to check price reports and shows your username on the leaderboard. Please read and accept the Privacy Notice to keep using the app.',
+    consentRead: 'Read the Privacy Notice',
+    consentAccept: 'I accept',
+    consentFailed: 'Couldn’t save your answer. Try again.',
     collectHeading: 'What we collect',
     collectBody:
       'Your username, email address and password (stored encrypted by our authentication provider). When you report a price, we record the station, the price, the time, and your location at that moment. Photos of price boards are stored only if you choose to attach one.',
     whyHeading: 'Why we collect it',
     whyBody:
-      'To run your account, to check that price reports come from people at the station, to award and track your points, and to show fuel prices to everyone using FuelWards. Your location is used only while you use the map or submit a report.',
+      'To run your account, to check that price reports come from people at the station, to award and track your points, and to show fuel prices to everyone using FuelWards. Your location is used only while you use the map or submit a report. If the app crashes, an error report (app version, device model and the error, never your location or account details) is sent to our crash-reporting service so we can fix it.',
     othersHeading: 'What others can see',
     othersBody:
       'Other users see your username on the leaderboard and the prices you report. They never see your email address or your location.',
     keepHeading: 'How long we keep it',
     keepBody:
-      'Account data is kept while your account is active. Report locations are kept for up to 12 months for fraud checks, then deleted. You can ask us to delete your account and data at any time.',
+      'Account data is kept while your account is active. Report locations are kept for up to 12 months for fraud checks, then deleted. You can download or delete your data at any time from your Profile.',
     rightsHeading: 'Your rights',
     rightsBody:
       'Under the Data Privacy Act of 2012 (RA 10173) you can access, correct, object to, and request deletion of your personal data. Contact the FuelWards team to exercise these rights.',

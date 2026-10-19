@@ -20,7 +20,7 @@ const styles = {
     box: 'bg-sky border-action/30',
     text: 'text-ink',
     icon: 'information-circle',
-    color: '#007BFF',
+    color: '#0066D6',
   },
 } as const;
 

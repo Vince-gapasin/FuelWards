@@ -25,7 +25,7 @@ export default function VoucherDetail() {
       <ScreenHeader title={t('vouchers.voucher')} fallback="/vouchers" />
       <ScrollView contentContainerClassName="px-6 py-6">
         <View className="w-full max-w-sm items-center gap-5 self-center">
-          {voucher.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {voucher.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {voucher.isError ? <Notice tone="error" message={t('vouchers.loadOneFailed')} /> : null}
           {v && state ? (
             <>

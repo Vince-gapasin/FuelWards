@@ -34,6 +34,7 @@ export default function Leaderboard() {
             accessibilityRole="tab"
             aria-selected={period === value}
             onPress={() => setPeriod(value)}
+            hitSlop={{ top: 4, bottom: 4 }}
             className={`h-9 flex-1 items-center justify-center rounded-full border ${
               period === value ? 'border-navy bg-navy' : 'border-line bg-surface active:bg-sky'
             }`}>
@@ -47,7 +48,7 @@ export default function Leaderboard() {
 
       <ScrollView contentContainerClassName="px-4 py-4">
         <View className="w-full max-w-md gap-2 self-center">
-          {board.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {board.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {board.isError ? <Notice tone="error" message={t('leaderboard.loadFailed')} /> : null}
           {board.isSuccess && top.length === 0 ? (
             <View className="items-center gap-2 py-10">

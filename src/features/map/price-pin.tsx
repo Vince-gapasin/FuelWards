@@ -26,7 +26,7 @@ export function PricePin({ station, fuel, selected }: Props) {
           shadowOffset: { width: 0, height: 1 },
           elevation: 3,
         }}>
-        <Text className="font-semibold text-[9px] leading-[10px] text-white/90">
+        <Text className="font-semibold text-[10px] leading-[10px] text-white/90">
           {brandCode(station.brand)}
         </Text>
         <Text className="font-bold text-xs leading-[14px] text-white">{formatPinPrice(price)}</Text>

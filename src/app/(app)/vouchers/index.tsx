@@ -22,7 +22,7 @@ export default function Vouchers() {
       <ScreenHeader title={t('vouchers.title')} fallback="/rewards" />
       <ScrollView contentContainerClassName="px-4 py-4">
         <View className="w-full max-w-md gap-3 self-center">
-          {vouchers.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {vouchers.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {vouchers.isError ? <Notice tone="error" message={t('vouchers.loadFailed')} /> : null}
           {vouchers.data?.length === 0 ? (
             <View className="items-center gap-2 py-10">
@@ -42,7 +42,7 @@ export default function Vouchers() {
                 <Ionicons
                   name="ticket"
                   size={24}
-                  className={state === 'active' ? 'text-brand' : 'text-ink-subtle'}
+                  className={state === 'active' ? 'text-positive' : 'text-ink-subtle'}
                 />
                 <View className="flex-1">
                   <Text className="font-bold text-base text-ink">
@@ -56,7 +56,7 @@ export default function Vouchers() {
                   </Text>
                 </View>
                 <View className={`rounded-full px-2 py-0.5 ${style.box}`}>
-                  <Text className={`font-semibold text-[11px] ${style.text}`}>
+                  <Text className={`font-semibold text-xs ${style.text}`}>
                     {t(`vouchers.states.${state}`)}
                   </Text>
                 </View>

@@ -15,7 +15,7 @@ const DISMISSED_KEY = 'fw.doeDismissed';
 const tones = {
   hike: { box: 'bg-danger/10 border-danger/30', icon: 'trending-up', color: '#BB0000' },
   rollback: { box: 'bg-brand/10 border-brand/30', icon: 'trending-down', color: '#00BF63' },
-  mixed: { box: 'bg-sky border-action/30', icon: 'swap-vertical', color: '#007BFF' },
+  mixed: { box: 'bg-sky border-action/30', icon: 'swap-vertical', color: '#0066D6' },
 } as const;
 
 /** This week's DOE price adjustment, shown on the map until the user dismisses it. */
@@ -63,7 +63,7 @@ export function DoeBanner({ fuelTypes }: { fuelTypes: FuelType[] }) {
           <Text
             accessibilityRole="link"
             onPress={() => Linking.openURL(source)}
-            className="font-semibold text-xs text-action underline">
+            className="font-semibold text-xs text-link underline">
             {t('doe.source')}
           </Text>
         ) : null}

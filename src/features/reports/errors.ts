@@ -37,6 +37,8 @@ export function reportErrorMessage(
       return t('report.errors.stationGone');
     case 'not_signed_in':
       return t('common.sessionExpired');
+    case 'banned':
+      return t('common.banned');
     case 'own_report':
       return t('report.errors.ownReport');
     case 'already_voted':

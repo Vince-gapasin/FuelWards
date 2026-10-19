@@ -37,11 +37,12 @@ export function SearchBar({ near, onPick }: Props) {
           autoCorrect={false}
           className="h-full flex-1 font-sans text-sm text-ink outline-none"
         />
-        {search.isFetching ? <ActivityIndicator size="small" color="#007BFF" /> : null}
+        {search.isFetching ? <ActivityIndicator size="small" color="#0066D6" /> : null}
         {query ? (
           <Pressable
+            accessibilityRole="button"
             accessibilityLabel={t('search.clear')}
-            hitSlop={8}
+            hitSlop={12}
             onPress={() => setQuery('')}>
             <Ionicons name="close-circle" size={18} color="#8A8A8A" />
           </Pressable>

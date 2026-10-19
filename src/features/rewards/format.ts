@@ -83,6 +83,8 @@ export function rewardErrorMessage(error: unknown): string {
       return t('rewards.unavailable');
     case 'not_signed_in':
       return t('common.sessionExpired');
+    case 'banned':
+      return t('common.banned');
   }
   if (error instanceof TypeError || /fetch|network/i.test(e.message ?? '')) {
     return t('common.networkError');

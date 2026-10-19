@@ -12,7 +12,7 @@ export function TextLink({
 }) {
   return (
     <Link href={href} replace={replace} asChild>
-      <Text accessibilityRole="link" className="font-semibold text-sm text-action underline">
+      <Text accessibilityRole="link" className="font-semibold text-sm text-link underline">
         {label}
       </Text>
     </Link>

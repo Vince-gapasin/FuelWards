@@ -105,7 +105,7 @@ export default function ReportPrices() {
     <SafeAreaView className="flex-1 bg-surface">
       <View className="flex-row items-center justify-between border-b border-line px-4 py-2">
         <View className="flex-row items-center gap-2">
-          <Ionicons name="create-outline" size={22} color="#00BF63" />
+          <Ionicons name="create-outline" size={22} className="text-positive" />
           <Text accessibilityRole="header" className="font-bold text-lg text-ink">
             {t('report.title')}
           </Text>
@@ -125,7 +125,7 @@ export default function ReportPrices() {
         className="flex-1">
         <ScrollView contentContainerClassName="gap-5 px-5 py-5" keyboardShouldPersistTaps="handled">
           <View className="w-full max-w-md gap-5 self-center">
-            {station.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+            {station.isPending ? <ActivityIndicator color="#0066D6" /> : null}
             {station.data ? (
               <View>
                 <Text className="font-bold text-xl text-ink">{station.data.name}</Text>
@@ -218,7 +218,7 @@ export default function ReportPrices() {
                     <View className="flex-row items-center gap-3">
                       <View className="w-24">
                         <Text className="font-semibold text-sm text-ink">{fuel.short_label}</Text>
-                        <Text className="text-[11px] text-ink-muted">
+                        <Text className="text-xs text-ink-muted">
                           {current
                             ? t('report.now', { price: formatPrice(current.price) })
                             : t('report.noPriceYet')}
@@ -243,7 +243,7 @@ export default function ReportPrices() {
                       </View>
                     </View>
                     {fieldErrors[fuel.code] ? (
-                      <Text accessibilityRole="alert" className="text-right text-xs text-danger">
+                      <Text accessibilityRole="alert" className="text-right text-xs text-critical">
                         {fieldErrors[fuel.code]}
                       </Text>
                     ) : null}

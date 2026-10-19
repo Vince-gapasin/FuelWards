@@ -18,15 +18,19 @@ import { useEffect, useState } from 'react';
 import { ToastHost } from '@/components/toast';
 import { useAuthListener, useAuthStore, useIsSignedIn } from '@/features/auth/auth-store';
 import { applyLanguagePreference, loadLanguagePreference } from '@/i18n';
+import { initMonitoring, withMonitoring } from '@/lib/monitoring';
 import { CACHE_MAX_AGE, createQueryClient, queryPersister } from '@/lib/query-client';
 import { ThemeRoot, useThemeColors } from '@/theme/theme';
 
 // Queries that are only useful fresh are not saved for offline use.
-const NOT_PERSISTED = new Set(['pending-reports', 'alerts', 'leaderboard']);
+const NOT_PERSISTED = new Set(['pending-reports', 'alerts', 'leaderboard', 'admin']);
 
+initMonitoring();
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+export default withMonitoring(RootLayout);
+
+function RootLayout() {
   const [queryClient] = useState(createQueryClient);
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,

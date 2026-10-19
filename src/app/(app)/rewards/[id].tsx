@@ -45,7 +45,7 @@ export default function RewardDetail() {
       <ScreenHeader title={t('rewards.reward')} fallback="/rewards" />
       <ScrollView contentContainerClassName="px-6 py-6">
         <View className="w-full max-w-md gap-5 self-center">
-          {rewards.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {rewards.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {rewards.isSuccess && !reward ? (
             <Notice tone="error" message={t('rewards.unavailable')} />
           ) : null}
@@ -53,7 +53,7 @@ export default function RewardDetail() {
             <>
               <View className="items-center gap-3 rounded-2xl bg-sky p-6">
                 <View className="h-14 w-14 items-center justify-center rounded-full bg-surface">
-                  <Ionicons name="pricetag" size={26} color="#007BFF" />
+                  <Ionicons name="pricetag" size={26} color="#0066D6" />
                 </View>
                 <Text
                   accessibilityRole="header"

@@ -22,7 +22,7 @@ export default function SavedStations() {
       <ScreenHeader title={t('saved.title')} />
       <ScrollView contentContainerClassName="px-4 py-4">
         <View className="w-full max-w-md gap-3 self-center">
-          {saved.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {saved.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {saved.isError ? <Notice tone="error" message={t('saved.loadFailed')} /> : null}
           {saved.data?.length === 0 ? (
             <View className="items-center gap-2 py-10">

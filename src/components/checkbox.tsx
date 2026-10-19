@@ -27,7 +27,7 @@ export function Checkbox({ checked, onChange, label, error }: Props) {
         {typeof label === 'string' ? <Text className="text-sm text-ink">{label}</Text> : label}
       </Pressable>
       {error ? (
-        <Text accessibilityRole="alert" className="text-sm text-danger">
+        <Text accessibilityRole="alert" className="text-sm text-critical">
           {error}
         </Text>
       ) : null}

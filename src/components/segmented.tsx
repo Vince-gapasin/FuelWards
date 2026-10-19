@@ -21,6 +21,7 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
               accessibilityRole="radio"
               aria-checked={active}
               onPress={() => onChange(option.value)}
+              hitSlop={{ top: 4, bottom: 4 }}
               className={`h-9 flex-1 items-center justify-center rounded-lg ${active ? 'bg-surface shadow-sm' : ''}`}>
               <Text className={`text-sm ${active ? 'font-semibold text-ink' : 'text-ink-muted'}`}>
                 {option.label}

@@ -12,7 +12,7 @@ const HEIGHT = 160;
 /** 30-day price line for one fuel. */
 export function PriceChart({
   points,
-  color = '#007BFF',
+  color = '#0066D6',
 }: {
   points: PricePoint[];
   color?: string;
@@ -43,7 +43,7 @@ export function PriceChart({
         <Text className="font-black text-2xl text-ink">{formatPrice(last?.price)}</Text>
         {points.length > 1 ? (
           <Text
-            className={`font-semibold text-sm ${change > 0 ? 'text-danger' : change < 0 ? 'text-brand' : 'text-ink-muted'}`}>
+            className={`font-semibold text-sm ${change > 0 ? 'text-critical' : change < 0 ? 'text-positive' : 'text-ink-muted'}`}>
             {change === 0
               ? t('chart.noChange')
               : t('chart.change', {
@@ -98,10 +98,10 @@ export function PriceChart({
         ) : null}
       </View>
       <View className="flex-row justify-between">
-        <Text className="text-[11px] text-ink-muted">
+        <Text className="text-xs text-ink-muted">
           {t('chart.high', { price: formatPrice(high) })}
         </Text>
-        <Text className="text-[11px] text-ink-muted">
+        <Text className="text-xs text-ink-muted">
           {t('chart.low', { price: formatPrice(low) })}
         </Text>
       </View>

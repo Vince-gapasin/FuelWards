@@ -11,7 +11,10 @@ import { Button } from '@/components/button';
 import { ScreenHeader } from '@/components/screen-header';
 import { Segmented } from '@/components/segmented';
 import { useToast } from '@/components/toast';
+import { useIsAdmin } from '@/features/admin/api';
 import { useProfile } from '@/features/auth/use-profile';
+import { deleteMyAccount, exportFileName, exportMyData } from '@/features/privacy/api';
+import { saveExport } from '@/features/privacy/save-export';
 import { usePointsHistory, useTiers } from '@/features/rewards/api';
 import { formatDate, reasonLabel } from '@/features/rewards/format';
 import { TierProgress } from '@/features/rewards/tier-progress';
@@ -27,7 +30,12 @@ export default function Account() {
   const history = usePointsHistory();
   const queryClient = useQueryClient();
   const showToast = useToast((s) => s.show);
+  const isAdmin = useIsAdmin();
   const [signingOut, setSigningOut] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+  const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -42,12 +50,41 @@ export default function Account() {
   const profile = data?.profile;
   const stats = data?.stats;
 
+  // Saved offline data belongs to this account; don't leave it on a shared device.
+  const forgetDevice = async () => {
+    queryClient.clear();
+    await queryPersister.removeClient();
+  };
+
   const signOut = async () => {
     setSigningOut(true);
     await supabase.auth.signOut();
-    queryClient.clear();
-    // Saved offline data belongs to this account; don't leave it on a shared device.
-    await queryPersister.removeClient();
+    await forgetDevice();
+  };
+
+  const downloadData = async () => {
+    if (!profile) return;
+    setExporting(true);
+    try {
+      await saveExport(await exportMyData(), exportFileName(profile.username));
+    } catch {
+      showToast(t('profile.downloadFailed'), 'error');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await deleteMyAccount();
+      await forgetDevice();
+      showToast(t('profile.deleted'), 'info');
+    } catch (e) {
+      setDeleting(false);
+      const lastAdmin = (e as { message?: string })?.message === 'last_admin';
+      showToast(t(lastAdmin ? 'profile.deleteLastAdmin' : 'profile.deleteFailed'), 'error');
+    }
   };
 
   const saveName = async () => {
@@ -132,7 +169,7 @@ export default function Account() {
               ))}
             </View>
           ) : (
-            <ActivityIndicator color="#007BFF" />
+            <ActivityIndicator color="#0066D6" />
           )}
 
           <View className="overflow-hidden rounded-2xl border border-line">
@@ -144,6 +181,9 @@ export default function Account() {
                 [t('profile.links.vouchers'), 'ticket-outline', '/vouchers'],
                 [t('profile.links.leaderboard'), 'trophy-outline', '/leaderboard'],
                 [t('profile.links.privacy'), 'shield-checkmark-outline', '/privacy'],
+                ...(isAdmin.data
+                  ? ([[t('profile.links.admin'), 'construct-outline', '/admin']] as const)
+                  : []),
               ] as const
             ).map(([label, icon, href], i) => (
               <Pressable
@@ -200,7 +240,7 @@ export default function Account() {
                   <Text className="text-xs text-ink-muted">{formatDate(entry.created_at)}</Text>
                 </View>
                 <Text
-                  className={`font-bold text-sm ${entry.delta > 0 ? 'text-brand' : 'text-ink-muted'}`}>
+                  className={`font-bold text-sm ${entry.delta > 0 ? 'text-positive' : 'text-ink-muted'}`}>
                   {entry.delta > 0 ? `+${entry.delta}` : entry.delta}
                 </Text>
               </View>
@@ -213,6 +253,61 @@ export default function Account() {
             onPress={signOut}
             loading={signingOut}
           />
+
+          <View className="gap-3 rounded-2xl border border-line p-4">
+            <Text accessibilityRole="header" className="font-bold text-lg text-ink">
+              {t('profile.yourData')}
+            </Text>
+            <Text className="text-sm text-ink-muted">{t('profile.downloadHint')}</Text>
+            <Button
+              label={t('profile.download')}
+              variant="outline"
+              onPress={downloadData}
+              loading={exporting}
+            />
+            {confirmingDelete && profile ? (
+              <View className="gap-2">
+                <Text className="text-sm text-ink">{t('profile.deleteWarning')}</Text>
+                <TextInput
+                  accessibilityLabel={t('profile.deleteConfirmLabel', {
+                    username: profile.username,
+                  })}
+                  placeholder={t('profile.deleteConfirmLabel', { username: profile.username })}
+                  placeholderTextColor="#8A8A8A"
+                  value={deleteText}
+                  onChangeText={setDeleteText}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="h-12 rounded-lg border border-line-strong px-3 font-sans text-base text-ink outline-none"
+                />
+                <View className="flex-row gap-2">
+                  <Button
+                    label={t('profile.deleteConfirm')}
+                    variant="danger"
+                    className="flex-1"
+                    disabled={deleteText.trim().toLowerCase() !== profile.username.toLowerCase()}
+                    loading={deleting}
+                    onPress={deleteAccount}
+                  />
+                  <Button
+                    label={t('common.cancel')}
+                    variant="outline"
+                    className="flex-1"
+                    onPress={() => {
+                      setConfirmingDelete(false);
+                      setDeleteText('');
+                    }}
+                  />
+                </View>
+              </View>
+            ) : (
+              <Button
+                label={t('profile.delete')}
+                variant="outline"
+                onPress={() => setConfirmingDelete(true)}
+              />
+            )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

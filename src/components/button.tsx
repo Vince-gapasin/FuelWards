@@ -1,18 +1,20 @@
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 
 import { useThemeColors } from '@/theme/theme';
-type Variant = 'primary' | 'secondary' | 'outline';
+type Variant = 'primary' | 'secondary' | 'outline' | 'danger';
 
 const containers: Record<Variant, string> = {
   primary: 'bg-action active:bg-navy-600',
   secondary: 'bg-brand active:bg-brand-light',
   outline: 'border border-line-strong bg-surface active:bg-sky',
+  danger: 'bg-danger active:opacity-80',
 };
 
 const labels: Record<Variant, string> = {
   primary: 'text-white',
-  secondary: 'text-white',
+  secondary: 'text-navy',
   outline: 'text-ink',
+  danger: 'text-white',
 };
 
 type Props = {

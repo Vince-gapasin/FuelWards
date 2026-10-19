@@ -78,7 +78,7 @@ export default function PointsPanel() {
           </View>
 
           <Text className="mt-2 font-bold text-lg text-ink">{t('rewards.redeemTitle')}</Text>
-          {rewards.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {rewards.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {rewards.isError ? <Notice tone="error" message={t('rewards.loadFailed')} /> : null}
           {rewards.data?.length === 0 ? (
             <Text className="text-sm text-ink-muted">No rewards are available right now.</Text>
@@ -94,7 +94,7 @@ export default function PointsPanel() {
                 onPress={() => router.push(`/rewards/${reward.id}`)}
                 className="flex-row items-center gap-3 rounded-2xl border border-line bg-surface p-4 active:bg-line/30">
                 <View className="h-10 w-10 items-center justify-center rounded-full bg-sky">
-                  <Ionicons name="pricetag" size={18} color="#007BFF" />
+                  <Ionicons name="pricetag" size={18} color="#0066D6" />
                 </View>
                 <View className="flex-1">
                   <Text className="font-bold text-base text-ink">{reward.title}</Text>

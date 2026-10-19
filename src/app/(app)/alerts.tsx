@@ -145,6 +145,7 @@ export default function Alerts() {
                   aria-checked={fuel === f.code}
                   accessibilityLabel={f.label}
                   onPress={() => setFuel(f.code)}
+                  hitSlop={{ top: 6, bottom: 6 }}
                   className={`h-8 justify-center rounded-full border px-3 ${
                     fuel === f.code
                       ? 'border-action bg-action'
@@ -191,6 +192,7 @@ export default function Alerts() {
                         accessibilityRole="radio"
                         aria-checked={radius === r}
                         onPress={() => setRadius(r)}
+                        hitSlop={{ top: 6, bottom: 6 }}
                         className={`h-8 flex-1 items-center justify-center rounded-full border ${
                           radius === r ? 'border-navy bg-navy' : 'border-line bg-surface'
                         }`}>
@@ -230,7 +232,7 @@ export default function Alerts() {
 
           <View className="gap-2">
             <Text className="font-bold text-lg text-ink">{t('alerts.mine')}</Text>
-            {alerts.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+            {alerts.isPending ? <ActivityIndicator color="#0066D6" /> : null}
             {alerts.data?.length === 0 ? (
               <Text className="text-sm text-ink-muted">{t('alerts.none')}</Text>
             ) : null}
@@ -279,7 +281,7 @@ export default function Alerts() {
                 className={`flex-row items-center gap-3 rounded-2xl border p-3 active:bg-sky ${
                   m.read_at ? 'border-line' : 'border-action bg-sky'
                 }`}>
-                <Ionicons name="pricetag" size={20} color="#00BF63" />
+                <Ionicons name="pricetag" size={20} className="text-positive" />
                 <View className="flex-1">
                   <Text className="font-semibold text-sm text-ink">
                     {t('alerts.match', {

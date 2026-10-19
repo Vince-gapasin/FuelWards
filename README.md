@@ -72,7 +72,7 @@ The inbox works everywhere. Phone notifications need two things this repo can't 
 
 ## DOE weekly bulletin
 
-The home screen shows the Department of Energy's weekly price adjustment when one is on file for the current week. It shows bulletins from up to 6 days ago through up to 7 days ahead. There's no admin screen yet (Phase 6), so add each week's bulletin in the Supabase SQL editor. Use one row per fuel, with peso-per-litre changes (negative for rollbacks):
+The home screen shows the Department of Energy's weekly price adjustment when one is on file for the current week. It shows bulletins from up to 6 days ago through up to 7 days ahead. Admins enter each week's bulletin in the admin console (DOE bulletins). You can also add them in the Supabase SQL editor, with one row per fuel and peso-per-litre changes (negative for rollbacks):
 
 ```sql
 insert into public.doe_bulletins (effective_date, fuel_type, change_min, change_max, source_url) values
@@ -87,6 +87,64 @@ Fuel codes are `GAS91`, `GAS95`, `GAS97`, `DIESEL`, `DIESEL_PLUS` and `KEROSENE`
 - **Offline:** stations, prices, favorites and your points are saved on the device for 24 hours. With no connection, the app shows the saved data under a banner. Reporting and voting still need a connection.
 - **Languages:** English and Filipino. By default the app follows the phone's language, and Profile → Language overrides it. Strings live in `src/i18n/en.ts` and `src/i18n/fil.ts`. A unit test fails if the Filipino file is missing a key or a `{{placeholder}}`.
 - **Dark mode:** by default the app follows the phone, and Profile → Appearance overrides it. Theme colours are CSS variables in `src/theme/palette.js`. Use the Tailwind names (`bg-surface`, `text-ink`, `border-line`…) rather than hex values, so screens switch automatically.
+- **Accessibility:** text colours meet WCAG AA contrast (4.5:1) in both themes. Use `text-link` for links, `text-positive` for gains and `text-critical` for errors, not the raw brand colours: the bright Figma green is only 2.3:1 on white. The action blue is a little darker than in Figma (`#0066D6`) so white text on it passes. Every button has a role and a label, and small chips get extra tap area (`hitSlop`).
+
+## Admin console
+
+Admins see **Admin console** in their profile (`/admin`). It is English only and works best in a laptop browser:
+
+- **Price reports:** confirm or reject unusual prices, or any price still waiting. Confirming awards the reporter's points, as if drivers had confirmed it.
+- **Users:** search users, and ban or unban them. A ban rejects the user's waiting prices and withdraws their votes, and blocks reporting, voting, alerts and redemptions until it is lifted. Admins can't be banned.
+- **Stations:** fix names and addresses, or hide closed stations from the map.
+- **Rewards:** add vouchers, change their cost and stock, or turn them off.
+- **DOE bulletins:** enter the weekly adjustment.
+- **Activity log:** every admin action, including direct edits, with before and after values. Nobody can edit the log.
+
+The server checks `is_admin()` on every admin call. Hiding the console from other users is only a convenience. To make someone an admin, run this in the Supabase SQL editor:
+
+```sql
+update public.profiles set role = 'admin' where username = 'their_username';
+```
+
+## Privacy
+
+- New users accept the Privacy Notice when they sign up. An account created any other way is asked to accept it before the app opens.
+- Report locations are erased after 12 months by a daily job (`fuelwards-purge-locations`, 03:17 Manila time). The period is `location_retention_months` in `app_config`.
+- Profile → Your data lets users download everything FuelWards holds about them as JSON, and delete their account. Deleting removes points, vouchers, saved stations, alerts and waiting prices. Confirmed prices stay on the map, without the reporter's name or location.
+- Crash reports (below) never include IP addresses, locations or account details.
+
+## Crash reporting (optional)
+
+The app reports crashes to [Sentry](https://sentry.io) (free Developer plan) when `EXPO_PUBLIC_SENTRY_DSN` is set. It stays off in development and when the DSN is blank.
+
+1. Create a Sentry account and a React Native project. Copy its DSN into `.env.local`, and into the EAS environment for builds.
+2. To get readable stack traces, add `SENTRY_AUTH_TOKEN` (secret), `SENTRY_ORG` and `SENTRY_PROJECT` as EAS environment variables. Then remove `SENTRY_DISABLE_AUTO_UPLOAD` from `eas.json`.
+
+## Release builds and hosting
+
+`eas.json` has three build profiles:
+
+- `development`: a dev client for testing native modules.
+- `preview`: an installable APK to share for testing.
+- `production`: an AAB for the Play Store, with the version code increased automatically.
+
+They need a free Expo account:
+
+```bash
+npx eas-cli@latest login
+```
+
+```bash
+npx eas-cli@latest init
+```
+
+```bash
+npx eas-cli@latest build --platform android --profile preview
+```
+
+`eas init` also sets the project ID that push notifications need. Add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (and the Sentry values, if you use them) as EAS environment variables first.
+
+The web app is a static site. `vercel.json` builds it with `npm run build:web` and serves `dist/`, sending every path to `index.html` so deep links work. Import the GitHub repo in Vercel (free Hobby plan) and set the two `EXPO_PUBLIC_SUPABASE_*` variables. Then add the Vercel URL to the Supabase redirect URLs in `supabase/config.toml` and run `npx supabase config push`.
 
 ## Database
 

@@ -104,7 +104,7 @@ export default function Home() {
           <View className="flex-row items-center gap-1.5">
             <Logo size={34} />
             <Text className="font-logo text-xl text-ink">
-              Fuel <Text className="text-brand">Rewards</Text>
+              Fuel <Text className="text-positive">Rewards</Text>
             </Text>
           </View>
           <View className="flex-row items-center gap-2">
@@ -124,6 +124,7 @@ export default function Home() {
                   : t('home.alerts')
               }
               onPress={() => router.push('/alerts')}
+              hitSlop={{ top: 4, bottom: 4 }}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-sky">
               <Ionicons name="notifications-outline" size={24} className="text-emphasis" />
               {unreadAlerts.data ? (
@@ -134,6 +135,7 @@ export default function Home() {
               accessibilityRole="button"
               accessibilityLabel={t('home.account')}
               onPress={() => router.push('/account')}
+              hitSlop={{ top: 4, bottom: 4 }}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-sky">
               <Ionicons name="person-circle-outline" size={28} className="text-emphasis" />
             </Pressable>
@@ -195,7 +197,7 @@ export default function Home() {
           <View className="flex-row items-center justify-end gap-2 px-3" pointerEvents="box-none">
             {nearby.isFetching ? (
               <View className="rounded-full bg-surface px-3 py-1.5 shadow-sm">
-                <ActivityIndicator size="small" color="#007BFF" />
+                <ActivityIndicator size="small" color="#0066D6" />
               </View>
             ) : null}
             <Pressable
@@ -206,7 +208,7 @@ export default function Home() {
               {locationStatus === 'locating' ? (
                 <ActivityIndicator color="#00BF63" />
               ) : (
-                <Ionicons name="locate" size={22} color="#00BF63" />
+                <Ionicons name="locate" size={22} className="text-positive" />
               )}
             </Pressable>
           </View>

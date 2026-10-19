@@ -60,14 +60,14 @@ export default function StationDetail() {
             <Ionicons
               name={saved ? 'heart' : 'heart-outline'}
               size={24}
-              className={saved ? 'text-danger' : 'text-ink'}
+              className={saved ? 'text-critical' : 'text-ink'}
             />
           </Pressable>
         }
       />
       <ScrollView contentContainerClassName="px-5 py-5">
         <View className="w-full max-w-md gap-5 self-center">
-          {station.isPending ? <ActivityIndicator color="#007BFF" /> : null}
+          {station.isPending ? <ActivityIndicator color="#0066D6" /> : null}
           {station.isError ? <Notice tone="error" message={t('station.loadFailed')} /> : null}
           {station.data ? (
             <View>
@@ -119,7 +119,7 @@ export default function StationDetail() {
                     <Text className="text-base text-ink">{fuel.label}</Text>
                     <View className="items-end">
                       <Text className="font-bold text-base text-ink">{formatPrice(p?.price)}</Text>
-                      <Text className="text-[11px] text-ink-muted">
+                      <Text className="text-xs text-ink-muted">
                         {p
                           ? t('card.updated', { age: formatAge(p.reported_at) })
                           : t('report.noPriceYet')}
@@ -144,6 +144,7 @@ export default function StationDetail() {
                   aria-checked={chartFuel === fuel.code}
                   accessibilityLabel={fuel.label}
                   onPress={() => setChartFuel(fuel.code)}
+                  hitSlop={{ top: 6, bottom: 6 }}
                   className={`h-8 justify-center rounded-full border px-3 ${
                     chartFuel === fuel.code
                       ? 'border-action bg-action'
@@ -157,7 +158,7 @@ export default function StationDetail() {
               ))}
             </ScrollView>
             {history.isPending ? (
-              <ActivityIndicator color="#007BFF" />
+              <ActivityIndicator color="#0066D6" />
             ) : (
               <PriceChart points={history.data?.[chartFuel] ?? []} />
             )}

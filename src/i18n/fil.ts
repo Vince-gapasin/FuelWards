@@ -16,6 +16,8 @@ export const fil: Translations = {
     points_other: '{{count}} points',
     pts: '{{count}} pts',
     logo: 'Logo ng Fuel Rewards',
+    banned:
+      'Suspendido ang iyong account sa pag-report, pagboto at rewards. Makipag-ugnayan sa FuelWards team kung sa tingin mo ay pagkakamali ito.',
   },
   age: {
     justNow: 'ngayon lang',
@@ -295,7 +297,20 @@ export const fil: Translations = {
       vouchers: 'Aking mga voucher',
       leaderboard: 'Leaderboard',
       privacy: 'Privacy Notice',
+      admin: 'Admin console',
     },
+    yourData: 'Ang iyong data',
+    download: 'I-download ang aking data',
+    downloadHint: 'Kopya ng iyong account, mga report, points at voucher bilang JSON file.',
+    downloadFailed: 'Hindi maihanda ang iyong data. Subukan ulit.',
+    delete: 'Burahin ang aking account',
+    deleteWarning:
+      'Permanenteng mabubura ang iyong account, points, voucher, naka-save na station at alerts. Ang mga presyong na-report mo na nakumpirma na ay mananatili sa mapa nang wala ang iyong pangalan. Ang mga presyong naghihintay pa ay aalisin.',
+    deleteConfirmLabel: 'I-type ang {{username}} para kumpirmahin',
+    deleteConfirm: 'Burahin nang tuluyan',
+    deleteFailed: 'Hindi mabura ang iyong account. Subukan ulit.',
+    deleteLastAdmin: 'Gawing admin ang ibang user bago burahin ang huling admin account.',
+    deleted: 'Nabura na ang iyong account.',
     appearance: 'Itsura',
     system: 'System',
     light: 'Maliwanag',
@@ -359,18 +374,24 @@ export const fil: Translations = {
   },
   privacy: {
     title: 'Privacy Notice',
+    consentTitle: 'Bago ka magpatuloy',
+    consentBody:
+      'Ginagamit ng FuelWards ang iyong lokasyon para suriin ang mga report ng presyo at ipinapakita ang iyong username sa leaderboard. Pakibasa at tanggapin ang Privacy Notice para patuloy na magamit ang app.',
+    consentRead: 'Basahin ang Privacy Notice',
+    consentAccept: 'Tinatanggap ko',
+    consentFailed: 'Hindi ma-save ang iyong sagot. Subukan ulit.',
     collectHeading: 'Ano ang kinokolekta namin',
     collectBody:
       'Ang iyong username, email address at password (naka-encrypt sa aming authentication provider). Kapag nag-report ka ng presyo, itinatala namin ang station, ang presyo, ang oras, at ang iyong lokasyon sa sandaling iyon. Itinatabi lang ang litrato ng price board kung pipiliin mong mag-attach.',
     whyHeading: 'Bakit namin ito kinokolekta',
     whyBody:
-      'Para patakbuhin ang iyong account, matiyak na galing sa mga taong nasa station ang mga report, magbigay at magtala ng iyong points, at maipakita ang presyo ng gasolina sa lahat ng gumagamit ng FuelWards. Ginagamit lang ang iyong lokasyon habang ginagamit mo ang mapa o nagre-report.',
+      'Para patakbuhin ang iyong account, matiyak na galing sa mga taong nasa station ang mga report, magbigay at magtala ng iyong points, at maipakita ang presyo ng gasolina sa lahat ng gumagamit ng FuelWards. Ginagamit lang ang iyong lokasyon habang ginagamit mo ang mapa o nagre-report. Kapag nag-crash ang app, nagpapadala ng error report (bersyon ng app, modelo ng device at ang error, hindi kailanman ang iyong lokasyon o detalye ng account) sa aming crash-reporting service para maayos namin ito.',
     othersHeading: 'Ano ang nakikita ng iba',
     othersBody:
       'Nakikita ng ibang user ang iyong username sa leaderboard at ang mga presyong inire-report mo. Hindi nila kailanman nakikita ang iyong email address o lokasyon.',
     keepHeading: 'Gaano katagal namin ito itinatabi',
     keepBody:
-      'Itinatabi ang data ng account habang aktibo ang iyong account. Itinatabi ang lokasyon ng mga report nang hanggang 12 buwan para sa pagsuri ng pandaraya, at saka binubura. Puwede mong hilingin anumang oras na burahin ang iyong account at data.',
+      'Itinatabi ang data ng account habang aktibo ang iyong account. Itinatabi ang lokasyon ng mga report nang hanggang 12 buwan para sa pagsuri ng pandaraya, at saka binubura. Puwede mong i-download o burahin ang iyong data anumang oras mula sa iyong Profile.',
     rightsHeading: 'Ang iyong mga karapatan',
     rightsBody:
       'Sa ilalim ng Data Privacy Act of 2012 (RA 10173), may karapatan kang i-access, itama, tutulan, at hilinging burahin ang iyong personal na data. Makipag-ugnayan sa FuelWards team para gamitin ang mga karapatang ito.',

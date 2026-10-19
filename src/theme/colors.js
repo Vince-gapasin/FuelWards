@@ -8,12 +8,17 @@ module.exports = {
   brand: { DEFAULT: '#00BF63', light: '#46D755' },
   fuel: '#FCCD0D',
   star: '#FFDF00',
-  action: '#007BFF',
+  // Darker than the Figma #007BFF so white text on it meets WCAG AA (5.4:1).
+  action: '#0066D6',
   points: '#FF8800',
   danger: { DEFAULT: '#BB0000', bright: '#FF0000' },
   surface: v('surface'),
   sky: v('sky'),
   emphasis: v('emphasis'),
+  // Text colours that need AA contrast on both light and dark surfaces.
+  link: v('link'),
+  positive: v('positive'),
+  critical: v('critical'),
   ink: { DEFAULT: v('ink'), muted: v('ink-muted'), subtle: v('ink-subtle') },
   line: { DEFAULT: v('line'), strong: v('line-strong') },
 };

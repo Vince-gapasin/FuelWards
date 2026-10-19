@@ -48,7 +48,8 @@
           "color": "#00BF63"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      ["@sentry/react-native/expo", { "url": "https://sentry.io/" }]
     ],
     "experiments": {
       "typedRoutes": false,
