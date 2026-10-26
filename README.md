@@ -231,7 +231,7 @@ npm run check
 
 This runs the type-check, ESLint, Prettier and the Jest unit tests. CI (`.github/workflows/ci.yml`) also builds the web app, tests the database, and runs the end-to-end tests.
 
-- **Database types:** `src/lib/database.types.ts` is generated from the schema and types the Supabase client. After a migration, run `npm run db:types` and commit the result. CI fails if the file doesn't match the migrations.
+- **Database types:** `src/lib/database.types.ts` is generated from the schema and types the Supabase client. After a migration, run `npm run db:types` and commit the result. CI regenerates the types from the migrations and type-checks the app against them, so code that relies on a renamed or dropped column fails CI.
 - **Web end-to-end (Playwright):** `e2e/web` signs up a new driver, searches a station, opens directions, sets an alert, checks badges and the language switch, and confirms `/admin` is closed to drivers. CI runs it against a local Supabase, never the hosted project. Locally, `npm run build:web` and then `npm run e2e:web` (only point it at a local Supabase, since it creates accounts).
 - **Phone smoke tests (Maestro):** with a phone connected over USB (or an emulator) and the APK installed, run `maestro test -e EMAIL=you@example.com -e PASSWORD=yourpassword e2e/maestro`. Install Maestro from https://maestro.dev.
 - **Architecture and security model:** see [docs/architecture.md](docs/architecture.md).

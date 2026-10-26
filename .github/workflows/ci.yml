@@ -53,13 +53,11 @@ jobs:
           name: playwright-report
           path: test-results/
           retention-days: 7
-      # The committed types (npm run db:types) must match the migrations. The hosted and local
-      # generators format differently, so both are run through Prettier before comparing, and the
-      # PostgREST version line is ignored.
-      - name: Check database types are up to date
+      # The app must type-check against the schema the migrations produce, so a column or function
+      # the app relies on can't be renamed or dropped unnoticed. (The generated text itself differs
+      # between Supabase CLI versions, so the committed file isn't compared line by line.)
+      - name: Type-check the app against the migrated schema
         if: success() || failure()
         run: |
-          supabase gen types typescript --local --schema public > /tmp/local.types.ts
-          npx prettier --stdin-filepath types.ts < /tmp/local.types.ts | grep -v PostgrestVersion > /tmp/local.norm.ts
-          npx prettier --stdin-filepath types.ts < src/lib/database.types.ts | grep -v PostgrestVersion > /tmp/committed.norm.ts
-          diff /tmp/committed.norm.ts /tmp/local.norm.ts
+          supabase gen types typescript --local --schema public > src/lib/database.types.ts
+          npm run typecheck

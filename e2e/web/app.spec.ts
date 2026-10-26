@@ -45,7 +45,7 @@ test.describe.serial('a new driver', () => {
     await page.locator('[aria-selected="true"]').first().click();
     await expect(page).toHaveURL(/\/station\//);
     await expect(page.getByText('Current prices')).toBeVisible();
-    await expect(page.getByText('Last 30 days')).toBeVisible();
+    await expect(page.getByText('Last 30 days', { exact: true })).toBeVisible();
   });
 
   test('offers Google Maps and Waze for directions', async () => {
