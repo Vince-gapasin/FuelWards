@@ -56,7 +56,7 @@ test.describe.serial('a new driver', () => {
 
   test('sets a price alert', async () => {
     await page.goto('/alerts');
-    await page.getByRole('button', { name: 'Diesel', exact: true }).click();
+    await page.getByRole('radio', { name: 'Diesel', exact: true }).click();
     await page.getByLabel('Maximum price per litre').fill('55');
     await page.getByRole('button', { name: 'Save alert' }).click();
     await expect(page.getByText(/Diesel at or below/)).toBeVisible();
