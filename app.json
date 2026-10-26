@@ -49,11 +49,22 @@
         }
       ],
       "expo-localization",
-      ["@sentry/react-native/expo", { "url": "https://sentry.io/" }]
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d7ccc76e-ecd8-424a-add6-383e34ef19ec"
+      }
+    },
+    "owner": "gapasin"
   }
 }
