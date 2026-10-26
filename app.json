@@ -54,7 +54,19 @@
         {
           "url": "https://sentry.io/"
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "buildArchs": ["arm64-v8a", "armeabi-v7a"]
+          }
+        }
+      ],
+      "expo-image",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": false,
@@ -65,6 +77,12 @@
         "projectId": "d7ccc76e-ecd8-424a-add6-383e34ef19ec"
       }
     },
-    "owner": "gapasin"
+    "owner": "gapasin",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d7ccc76e-ecd8-424a-add6-383e34ef19ec"
+    }
   }
 }

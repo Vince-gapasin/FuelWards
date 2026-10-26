@@ -1,0 +1,28 @@
+# Log in, search the map for a station and open its details.
+# Run with: maestro test -e EMAIL=you@example.com -e PASSWORD=yourpassword e2e/maestro
+appId: com.fuelwards.app
+---
+- launchApp:
+    clearState: true
+- tapOn: 'Log In'
+- tapOn:
+    text: 'Email'
+    index: 1
+- inputText: ${EMAIL}
+- tapOn:
+    text: 'Password'
+    index: 1
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn: 'Log in'
+- extendedWaitUntil:
+    visible: 'Search station, brand or street'
+    timeout: 20000
+- tapOn: 'Search station, brand or street'
+- inputText: 'petron'
+- tapOn: 'Petron.*'
+- tapOn:
+    text: 'Petron.*'
+    index: 0
+- assertVisible: 'Current prices'
+- assertVisible: 'Last 30 days'

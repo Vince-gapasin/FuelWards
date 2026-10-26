@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { brandCode, formatPinPrice, priceFor } from '@/features/stations/format';
 import type { Station } from '@/features/stations/types';
+import { useRecentlyUpdated } from '@/features/stations/use-live-prices';
 
 type Props = { station: Station; fuel: string; selected: boolean };
 
@@ -11,13 +12,15 @@ export function PricePin({ station, fuel, selected }: Props) {
   const { t } = useTranslation();
   const price = priceFor(station, fuel);
   const color = station.brand_color ?? '#011D39';
+  // A price that just changed live gets a yellow ring for a few seconds.
+  const fresh = useRecentlyUpdated(station.id);
   return (
     <View
       accessibilityLabel={`${station.name}, ${price == null ? t('map.noPrice') : formatPinPrice(price)}`}
       className="items-center"
-      style={{ transform: [{ scale: selected ? 1.15 : 1 }] }}>
+      style={{ transform: [{ scale: selected || fresh ? 1.15 : 1 }] }}>
       <View
-        className={`min-w-[44px] items-center rounded-full px-2 py-1 ${selected ? 'border-2 border-white' : ''}`}
+        className={`min-w-[44px] items-center rounded-full px-2 py-1 ${fresh ? 'border-2 border-star' : selected ? 'border-2 border-white' : ''}`}
         style={{
           backgroundColor: price == null ? '#5A5A5A' : color,
           shadowColor: '#000',

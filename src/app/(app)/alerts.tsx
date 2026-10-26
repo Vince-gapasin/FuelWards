@@ -25,6 +25,8 @@ import {
   useMarkAlertsRead,
   useMyAlerts,
   useSetAlertActive,
+  useNotifySettings,
+  useSetNotifyDoe,
 } from '@/features/alerts/api';
 import { enablePush, getPushStatus } from '@/features/alerts/push';
 import type { PushStatus } from '@/features/alerts/push-types';
@@ -108,6 +110,9 @@ export default function Alerts() {
     }
   };
 
+  const settings = useNotifySettings();
+  const setNotifyDoe = useSetNotifyDoe();
+
   const onEnablePush = async () => {
     try {
       setPush(await enablePush());
@@ -134,6 +139,25 @@ export default function Alerts() {
               ) : null}
             </View>
           ) : null}
+
+          <View className="flex-row items-center gap-3 rounded-2xl border border-line p-3">
+            <Ionicons name="megaphone-outline" size={22} className="text-emphasis" />
+            <View className="flex-1">
+              <Text className="font-semibold text-sm text-ink">{t('alerts.doeTitle')}</Text>
+              <Text className="text-xs text-ink-muted">{t('alerts.doeHint')}</Text>
+            </View>
+            <Switch
+              accessibilityLabel={t('alerts.doeTitle')}
+              value={settings.data?.notify_doe ?? true}
+              disabled={!settings.data || setNotifyDoe.isPending}
+              onValueChange={(on) =>
+                setNotifyDoe.mutate(on, {
+                  onError: () => showToast(t('common.genericError'), 'error'),
+                })
+              }
+              trackColor={{ true: '#00BF63', false: '#D9D9D9' }}
+            />
+          </View>
 
           <View className="gap-3">
             <Text className="font-bold text-lg text-ink">{t('alerts.newAlert')}</Text>

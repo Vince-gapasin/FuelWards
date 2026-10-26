@@ -105,11 +105,14 @@ export function useFavoriteIds() {
   return useQuery({
     queryKey: ['favorites', 'ids', userId],
     enabled: Boolean(userId),
+    // The cache keeps a plain array: it is saved as JSON for offline use, and a Set would come
+    // back as {}. Screens get a Set through `select`.
     queryFn: async () => {
       const { data, error } = await supabase.from('favorites').select('station_id');
       if (error) throw error;
-      return new Set(data.map((f) => f.station_id as string));
+      return data.map((f) => f.station_id);
     },
+    select: (ids) => new Set(Array.isArray(ids) ? ids : []),
   });
 }
 

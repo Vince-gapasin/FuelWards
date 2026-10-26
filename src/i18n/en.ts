@@ -98,6 +98,8 @@ export const en = {
     priceRange: 'Must be between ₱{{min}} and ₱{{max}}',
   },
   home: {
+    live: 'Prices update live',
+    liveShort: 'Live',
     pointsBadge: '{{count}} points. Open rewards',
     alerts: 'Price alerts',
     alertsNew: 'Price alerts, {{count}} new',
@@ -260,6 +262,41 @@ export const en = {
     details: 'Redeemed {{date}} for {{points}} points · valid until {{until}}',
     states: { active: 'Active', used: 'Used', expired: 'Expired', cancelled: 'Cancelled' },
   },
+  directions: {
+    title: 'Get directions with',
+  },
+  badges: {
+    title: 'Badges',
+    streak_one: '{{count}}-day streak',
+    streak_other: '{{count}}-day streak',
+    noStreak: 'Report a price today to start a streak',
+    best: 'Best: {{count}} days',
+    earned: 'Earned',
+    progress: '{{progress}} of {{goal}}',
+    newBadge: 'New badge: {{name}}!',
+    names: {
+      first_price: 'First price',
+      prices_10: '10 prices',
+      prices_50: '50 prices',
+      first_vote: 'First vote',
+      votes_10: '10 votes',
+      explorer: 'Explorer',
+      early_bird: 'Early bird',
+      streak_3: '3-day streak',
+      streak_7: '7-day streak',
+    },
+    hints: {
+      first_price: 'Get your first price confirmed',
+      prices_10: 'Get 10 prices confirmed',
+      prices_50: 'Get 50 prices confirmed',
+      first_vote: 'Vote the same way as the final result',
+      votes_10: 'Make 10 votes that match the result',
+      explorer: 'Get prices confirmed at 5 different stations',
+      early_bird: 'Report a confirmed price before 7 AM',
+      streak_3: 'Confirmed prices on 3 days in a row',
+      streak_7: 'Confirmed prices on 7 days in a row',
+    },
+  },
   leaderboard: {
     title: 'Leaderboard',
     week: 'This week',
@@ -318,6 +355,9 @@ export const en = {
     },
   },
   alerts: {
+    doeTitle: 'Weekly DOE price adjustment',
+    doeHint:
+      'Get a notification when the Department of Energy announces next week’s price changes.',
     title: 'Price alerts',
     push: {
       unsupported: 'Notifications work in the phone app. Matches also appear in your inbox below.',
@@ -369,7 +409,7 @@ export const en = {
     consentFailed: 'Couldn’t save your answer. Try again.',
     collectHeading: 'What we collect',
     collectBody:
-      'Your username, email address and password (stored encrypted by our authentication provider). When you report a price, we record the station, the price, the time, and your location at that moment. Photos of price boards are stored only if you choose to attach one.',
+      'Your username, email address and password (stored encrypted by our authentication provider). When you report a price, we record the station, the price, the time, and your location at that moment.',
     whyHeading: 'Why we collect it',
     whyBody:
       'To run your account, to check that price reports come from people at the station, to award and track your points, and to show fuel prices to everyone using FuelWards. Your location is used only while you use the map or submit a report. If the app crashes, an error report (app version, device model and the error, never your location or account details) is sent to our crash-reporting service so we can fix it.',

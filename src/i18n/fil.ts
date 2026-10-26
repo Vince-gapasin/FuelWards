@@ -102,6 +102,8 @@ export const fil: Translations = {
     priceRange: 'Dapat nasa pagitan ng ₱{{min}} at ₱{{max}}',
   },
   home: {
+    live: 'Live na nag-a-update ang mga presyo',
+    liveShort: 'Live',
     pointsBadge: '{{count}} points. Buksan ang rewards',
     alerts: 'Price alerts',
     alertsNew: 'Price alerts, {{count}} bago',
@@ -267,6 +269,41 @@ export const fil: Translations = {
     details: 'Na-redeem noong {{date}} sa halagang {{points}} points · valid hanggang {{until}}',
     states: { active: 'Aktibo', used: 'Nagamit na', expired: 'Expired', cancelled: 'Kinansela' },
   },
+  directions: {
+    title: 'Kumuha ng direksyon gamit ang',
+  },
+  badges: {
+    title: 'Mga badge',
+    streak_one: '{{count}} araw na sunod-sunod',
+    streak_other: '{{count}} araw na sunod-sunod',
+    noStreak: 'Mag-report ng presyo ngayon para magsimula ng streak',
+    best: 'Pinakamahaba: {{count}} araw',
+    earned: 'Nakuha na',
+    progress: '{{progress}} sa {{goal}}',
+    newBadge: 'Bagong badge: {{name}}!',
+    names: {
+      first_price: 'Unang presyo',
+      prices_10: '10 presyo',
+      prices_50: '50 presyo',
+      first_vote: 'Unang boto',
+      votes_10: '10 boto',
+      explorer: 'Explorer',
+      early_bird: 'Early bird',
+      streak_3: '3 araw na sunod',
+      streak_7: '7 araw na sunod',
+    },
+    hints: {
+      first_price: 'Ipakumpirma ang iyong unang presyo',
+      prices_10: 'Ipakumpirma ang 10 presyo',
+      prices_50: 'Ipakumpirma ang 50 presyo',
+      first_vote: 'Bumoto nang tugma sa huling resulta',
+      votes_10: 'Gumawa ng 10 botong tugma sa resulta',
+      explorer: 'Ipakumpirma ang presyo sa 5 magkakaibang station',
+      early_bird: 'Mag-report ng kumpirmadong presyo bago mag-7 ng umaga',
+      streak_3: 'May kumpirmadong presyo sa 3 sunod-sunod na araw',
+      streak_7: 'May kumpirmadong presyo sa 7 sunod-sunod na araw',
+    },
+  },
   leaderboard: {
     title: 'Leaderboard',
     week: 'Ngayong linggo',
@@ -327,6 +364,9 @@ export const fil: Translations = {
     },
   },
   alerts: {
+    doeTitle: 'Lingguhang price adjustment ng DOE',
+    doeHint:
+      'Makatanggap ng notification kapag inanunsyo ng Department of Energy ang pagbabago ng presyo sa susunod na linggo.',
     title: 'Price alerts',
     push: {
       unsupported:
@@ -382,7 +422,7 @@ export const fil: Translations = {
     consentFailed: 'Hindi ma-save ang iyong sagot. Subukan ulit.',
     collectHeading: 'Ano ang kinokolekta namin',
     collectBody:
-      'Ang iyong username, email address at password (naka-encrypt sa aming authentication provider). Kapag nag-report ka ng presyo, itinatala namin ang station, ang presyo, ang oras, at ang iyong lokasyon sa sandaling iyon. Itinatabi lang ang litrato ng price board kung pipiliin mong mag-attach.',
+      'Ang iyong username, email address at password (naka-encrypt sa aming authentication provider). Kapag nag-report ka ng presyo, itinatala namin ang station, ang presyo, ang oras, at ang iyong lokasyon sa sandaling iyon.',
     whyHeading: 'Bakit namin ito kinokolekta',
     whyBody:
       'Para patakbuhin ang iyong account, matiyak na galing sa mga taong nasa station ang mga report, magbigay at magtala ng iyong points, at maipakita ang presyo ng gasolina sa lahat ng gumagamit ng FuelWards. Ginagamit lang ang iyong lokasyon habang ginagamit mo ang mapa o nagre-report. Kapag nag-crash ang app, nagpapadala ng error report (bersyon ng app, modelo ng device at ang error, hindi kailanman ang iyong lokasyon o detalye ng account) sa aming crash-reporting service para maayos namin ito.',

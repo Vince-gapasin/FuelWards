@@ -1,0 +1,7 @@
+# Fresh install: the welcome screen offers log in and sign up.
+appId: com.fuelwards.app
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Log In'
+- assertVisible: 'Sign Up'

@@ -6,6 +6,7 @@ import {
   formatPinPrice,
   formatPrice,
   sortStations,
+  wazeUrl,
 } from '@/features/stations/format';
 import type { Station } from '@/features/stations/types';
 
@@ -58,6 +59,12 @@ describe('formatting', () => {
   it('links to Google Maps directions', () => {
     expect(directionsUrl({ latitude: 14.6, longitude: 121.01 })).toBe(
       'https://www.google.com/maps/dir/?api=1&destination=14.6,121.01',
+    );
+  });
+
+  it('links to Waze navigation', () => {
+    expect(wazeUrl({ latitude: 14.6, longitude: 121.01 })).toBe(
+      'https://waze.com/ul?ll=14.6,121.01&navigate=yes',
     );
   });
 });

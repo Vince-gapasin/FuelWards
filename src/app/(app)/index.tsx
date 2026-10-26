@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { Logo } from '@/components/logo';
+import { useLiveState } from '@/features/stations/use-live-prices';
 import { Notice } from '@/components/notice';
 import { OfflineBanner } from '@/components/offline-banner';
 import { useUnreadAlertCount } from '@/features/alerts/api';
@@ -53,6 +54,7 @@ export default function Home() {
 
   const profile = useProfile();
   const unreadAlerts = useUnreadAlertCount();
+  const live = useLiveState((s) => s.connected);
   const fuelTypes = useFuelTypes();
   const nearby = useNearbyStations(queryCenter);
   const stations = useMemo(
@@ -106,6 +108,14 @@ export default function Home() {
             <Text className="font-logo text-xl text-ink">
               Fuel <Text className="text-positive">Rewards</Text>
             </Text>
+            {live ? (
+              <View
+                accessibilityLabel={t('home.live')}
+                className="flex-row items-center gap-1 rounded-full bg-sky px-2 py-0.5">
+                <View className="h-2 w-2 rounded-full bg-brand" />
+                <Text className="font-semibold text-xs text-ink">{t('home.liveShort')}</Text>
+              </View>
+            ) : null}
           </View>
           <View className="flex-row items-center gap-2">
             <Pressable

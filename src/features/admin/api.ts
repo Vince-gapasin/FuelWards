@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/auth-store';
 import { useDebounced } from '@/features/stations/use-stations';
+import type { TablesInsert, TablesUpdate } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
 // Admin console data. Every call is checked again on the server (is_admin), so hiding the
@@ -151,7 +152,7 @@ export function useSetBan() {
         supabase.rpc('admin_set_ban', {
           p_user_id: id,
           p_banned: banned,
-          p_reason: reason ?? null,
+          p_reason: reason || undefined,
         }),
       ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['admin'] }),
@@ -198,7 +199,10 @@ export function useAdminStations(search: string) {
 export function useUpdateStation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...changes }: Partial<AdminStation> & { id: string }) =>
+    mutationFn: ({
+      id,
+      ...changes
+    }: { id: string } & Partial<Pick<AdminStation, 'name' | 'address' | 'is_active'>>) =>
       unwrap<void>(supabase.from('stations').update(changes).eq('id', id)),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin'] });
@@ -220,15 +224,18 @@ export function useAdminRewards() {
   });
 }
 
+/** A new reward needs a title and a cost; an edit (with id) can change any field. */
+type RewardInput =
+  ({ id?: undefined } & TablesInsert<'rewards'>) | ({ id: string } & TablesUpdate<'rewards'>);
+
 export function useSaveReward() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...fields }: Partial<AdminReward>) =>
-      unwrap<void>(
-        id
-          ? supabase.from('rewards').update(fields).eq('id', id)
-          : supabase.from('rewards').insert(fields),
-      ),
+    mutationFn: (input: RewardInput) => {
+      if (input.id === undefined) return unwrap<void>(supabase.from('rewards').insert(input));
+      const { id, ...fields } = input;
+      return unwrap<void>(supabase.from('rewards').update(fields).eq('id', id));
+    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin'] });
       queryClient.invalidateQueries({ queryKey: ['rewards'] });
@@ -278,6 +285,16 @@ export function useDeleteBulletin() {
   });
 }
 
+/** Sends the week's bulletin as a push notification to drivers who opted in. */
+export function useAnnounceBulletin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (date: string) =>
+      unwrap<number>(supabase.rpc('admin_announce_bulletin', { p_date: date })),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['admin'] }),
+  });
+}
+
 export function useAuditLog() {
   return useQuery({
     queryKey: ['admin', 'log'],
@@ -299,6 +316,10 @@ export function adminErrorMessage(error: unknown): string {
       return 'Admins can’t be banned. Remove their admin role first.';
     case 'user_not_found':
       return 'That user no longer exists.';
+    case 'already_announced':
+      return 'Drivers were already notified about this week.';
+    case 'no_bulletin':
+      return 'Save the bulletin before notifying drivers.';
   }
   if (/duplicate key/i.test(message)) return 'That already exists.';
   if (/fetch|network/i.test(message)) return 'No connection. Try again.';

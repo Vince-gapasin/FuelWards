@@ -61,8 +61,9 @@ export async function enablePush(): Promise<PushStatus> {
 export function useAlertNotificationTaps() {
   useEffect(() => {
     const open = (response: Notifications.NotificationResponse | null) => {
-      const stationId = response?.notification.request.content.data?.stationId;
-      if (typeof stationId === 'string') router.push(`/station/${stationId}`);
+      const data = response?.notification.request.content.data;
+      if (typeof data?.stationId === 'string') router.push(`/station/${data.stationId}`);
+      else if (data?.kind === 'doe') router.push('/');
     };
     Notifications.getLastNotificationResponseAsync().then(open);
     const sub = Notifications.addNotificationResponseReceivedListener(open);

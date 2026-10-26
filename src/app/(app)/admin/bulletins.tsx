@@ -7,12 +7,14 @@ import { useToast } from '@/components/toast';
 import {
   adminErrorMessage,
   useAddBulletins,
+  useAnnounceBulletin,
+  useAuditLog,
   useBulletins,
   useDeleteBulletin,
   type Bulletin,
 } from '@/features/admin/api';
 import { bulletinRows, nextAdjustmentDate } from '@/features/admin/format';
-import { AdminPage, Card, Empty } from '@/features/admin/ui';
+import { AdminPage, Card, Empty, Pill } from '@/features/admin/ui';
 import { formatChange, formatEffectiveDate } from '@/features/doe/bulletin';
 import { useFuelTypes } from '@/features/stations/use-stations';
 
@@ -22,6 +24,10 @@ const input =
 export default function AdminBulletins() {
   const bulletins = useBulletins();
   const fuelTypes = useFuelTypes();
+  const log = useAuditLog();
+  const announced = new Set(
+    (log.data ?? []).filter((a) => a.action === 'announce_bulletin').map((a) => a.target_id),
+  );
   const label = (code: string) => fuelTypes.data?.find((f) => f.code === code)?.short_label ?? code;
 
   const byDate = useMemo(() => {
@@ -61,9 +67,31 @@ export default function AdminBulletins() {
               Source: {rows[0].source_url}
             </Text>
           ) : null}
+          <AnnounceButton date={date} announced={announced.has(date)} />
         </Card>
       ))}
     </AdminPage>
+  );
+}
+
+/** Notifies drivers about this week's change. Each week can be announced once. */
+function AnnounceButton({ date, announced }: { date: string; announced: boolean }) {
+  const announce = useAnnounceBulletin();
+  const showToast = useToast((s) => s.show);
+  if (announced) return <Pill label="Drivers notified" tone="good" />;
+  return (
+    <Button
+      label="Notify drivers"
+      variant="outline"
+      loading={announce.isPending}
+      onPress={() =>
+        announce.mutate(date, {
+          onSuccess: (count) =>
+            showToast(count === 1 ? 'Sent to 1 driver.' : `Sent to ${count} drivers.`),
+          onError: (e) => showToast(adminErrorMessage(e), 'error'),
+        })
+      }
+    />
   );
 }
 

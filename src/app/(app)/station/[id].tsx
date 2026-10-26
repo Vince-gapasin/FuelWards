@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +10,8 @@ import { Notice } from '@/components/notice';
 import { ScreenHeader } from '@/components/screen-header';
 import { useToast } from '@/components/toast';
 import { usePendingReports, useStationDetails } from '@/features/reports/api';
-import { directionsUrl, formatAge, formatPrice } from '@/features/stations/format';
+import { DirectionsPicker } from '@/features/stations/directions-picker';
+import { formatAge, formatPrice } from '@/features/stations/format';
 import { PriceChart } from '@/features/stations/price-chart';
 import {
   useFavoriteIds,
@@ -23,6 +24,7 @@ import {
 export default function StationDetail() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [picking, setPicking] = useState(false);
   const station = useStationDetails(id);
   const pending = usePendingReports(id);
   const history = usePriceHistory(id);
@@ -86,7 +88,7 @@ export default function StationDetail() {
               label={t('card.directions')}
               className="flex-1"
               disabled={!station.data}
-              onPress={() => station.data && Linking.openURL(directionsUrl(station.data))}
+              onPress={() => setPicking(true)}
             />
             <Button
               label={t('card.updatePrice')}
@@ -165,6 +167,10 @@ export default function StationDetail() {
           </View>
         </View>
       </ScrollView>
+      <DirectionsPicker
+        target={picking && station.data ? station.data : null}
+        onClose={() => setPicking(false)}
+      />
     </SafeAreaView>
   );
 }

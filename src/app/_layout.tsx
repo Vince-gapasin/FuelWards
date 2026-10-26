@@ -61,6 +61,8 @@ function RootLayout() {
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
+        // Bump when a cached shape changes, so old offline copies are dropped instead of misread.
+        buster: '2',
         persister: queryPersister,
         maxAge: CACHE_MAX_AGE,
         dehydrateOptions: {

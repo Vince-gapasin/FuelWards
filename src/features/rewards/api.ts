@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/features/auth/auth-store';
 import { supabase } from '@/lib/supabase';
 
+import type { BadgeSummary } from './badges';
 import type { Tier } from './format';
 
 export type Reward = {
@@ -141,6 +142,20 @@ export function usePointsHistory() {
         .limit(30);
       if (error) throw error;
       return data as LedgerEntry[];
+    },
+  });
+}
+
+/** Badges and day streaks. Shares the profile key so reports and votes refresh it too. */
+export function useBadges() {
+  const userId = useAuthStore((s) => s.session?.user.id);
+  return useQuery({
+    queryKey: ['profile', 'badges', userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('my_badges');
+      if (error) throw error;
+      return data as BadgeSummary;
     },
   });
 }

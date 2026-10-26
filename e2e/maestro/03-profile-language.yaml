@@ -1,0 +1,14 @@
+# Profile: badges are shown and the language can be switched to Filipino and back.
+# Run after 02 (needs a signed-in session): maestro test e2e/maestro/03-profile-language.yaml
+appId: com.fuelwards.app
+---
+- launchApp
+- tapOn: 'Account'
+- assertVisible: 'Badges'
+- scrollUntilVisible:
+    element: 'Filipino'
+- tapOn: 'Filipino'
+- assertVisible: 'Wika'
+- tapOn:
+    text: 'System'
+    index: 1

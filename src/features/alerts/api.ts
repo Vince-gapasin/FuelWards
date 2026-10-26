@@ -102,10 +102,11 @@ export function useCreateAlert() {
       const { error } = await supabase.rpc('create_price_alert', {
         p_fuel_type: alert.fuelType,
         p_max_price: alert.maxPrice,
-        p_lat: alert.at?.latitude ?? null,
-        p_lng: alert.at?.longitude ?? null,
+        // Left out (not null) when unused, so the function's defaults apply.
+        p_lat: alert.at?.latitude,
+        p_lng: alert.at?.longitude,
         p_radius_m: alert.radiusM,
-        p_station_id: alert.stationId ?? null,
+        p_station_id: alert.stationId ?? undefined,
       });
       if (error) throw error;
     },
@@ -159,4 +160,29 @@ export function alertErrorMessage(error: unknown): string {
   if (e.code === '23514') return i18n.t('alerts.errors.needArea');
   if (e.code === '23503') return i18n.t('alerts.errors.unavailable');
   return i18n.t('alerts.errors.generic');
+}
+
+/** The signed-in user's notification settings. */
+export function useNotifySettings() {
+  const userId = useAuthStore((s) => s.session?.user.id);
+  return useQuery({
+    queryKey: ['alerts', 'settings', userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('my_settings');
+      if (error) throw error;
+      return data as { notify_doe: boolean };
+    },
+  });
+}
+
+export function useSetNotifyDoe() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (on: boolean) => {
+      const { error } = await supabase.rpc('set_notify_doe', { p_on: on });
+      if (error) throw error;
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['alerts', 'settings'] }),
+  });
 }

@@ -50,6 +50,15 @@ export async function loadThemePreference(): Promise<ThemePreference> {
 }
 
 /** Applies the active scheme's colour variables to everything below it. */
+/**
+ * The colour variables for the current theme. Content rendered outside ThemeRoot (a Modal on web
+ * is portalled to <body>) needs these on its own root, or theme colours come out blank.
+ */
+export function useThemeVars() {
+  const { colorScheme } = useColorScheme();
+  return themeVars[colorScheme === 'dark' ? 'dark' : 'light'];
+}
+
 export function ThemeRoot({ children }: { children: ReactNode }) {
   const { colorScheme, setColorScheme } = useColorScheme();
 

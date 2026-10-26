@@ -4,6 +4,8 @@ A crowdsourced fuel-price map for the Philippines. Drivers see current pump pric
 
 - Design: [FUELWARDS Figma prototype](https://www.figma.com/design/mODm20NVwxDhimytGSUtUR/FUELWARDS)
 - Why it matters and what the prototype lacks: [docs/analysis.md](docs/analysis.md)
+- How it's built (diagrams, security model, testing): [docs/architecture.md](docs/architecture.md)
+- Try it: [web app](https://fuelwards.vercel.app) · [Android APK](https://github.com/Vince-gapasin/FuelWards/releases/latest)
 
 ## Stack
 
@@ -61,14 +63,21 @@ The app never writes prices or points itself. It calls database functions (`supa
 
 Every number above lives in the `app_config` table. For a demo away from a real station, raise `max_report_distance_m` and `max_vote_distance_m` there, and put them back afterwards.
 
+## Live prices and badges
+
+- **Live prices:** when a price is verified, a database trigger broadcasts it on the public Realtime topic `prices` (station, fuel, price and times only, never who sent it). Open apps update the map pin, the station page and saved stations without a reload, and the pin gets a yellow ring for a few seconds. The home screen shows a "Live" badge while connected. An older report confirmed late never replaces a newer price.
+- **Badges and streaks:** `my_badges()` works out nine badges (first price, 10 and 50 confirmed prices, first and 10 helpful votes, explorer, early bird, 3- and 7-day streaks) and the current and best day streak from existing reports and votes. They show on the profile, with progress for locked ones and a toast when one is earned. Badges never award points.
+
 ## Price alerts and notifications
 
-Drivers set alerts on the Price alerts screen, for example "Diesel at or below ₱58 within 3 km" or "at one saved station". Each driver can have up to 10. When a price becomes verified, a database trigger matches it against active alerts and adds a row to that driver's inbox. The same alert won't fire again for the same station within 12 hours. A pg_cron job (`fuelwards-alert-pushes`, every 5 minutes) then sends the new matches through the Expo push service.
+Drivers set alerts on the Price alerts screen, for example "Diesel at or below ₱58 within 3 km" or "at one saved station". Each driver can have up to 10. When a price becomes verified, a database trigger matches it against active alerts and adds a row to that driver's inbox. The same alert won't fire again for the same station within 12 hours. A pg_cron job (`fuelwards-alert-pushes`, every 5 minutes) runs `send_pushes()`, which sends the new matches, and anything else in `push_outbox`, through the Expo push service.
+
+**DOE weekly adjustment:** after saving a week's bulletin, an admin presses **Notify drivers** in the admin console. Every driver who has a phone registered and hasn't turned it off (Price alerts → Weekly DOE price adjustment) gets one push, e.g. "Fuel price adjustment on Tue, Nov 3: Reg 91 +₱1.10 to +₱1.30, Diesel −₱0.50". Each week can be announced once. Push text is English only, because the server doesn't know each phone's language.
 
 The inbox works everywhere. Phone notifications need two things this repo can't do for you:
 
-1. An Expo project id. Run `npx eas-cli init` once. It adds `extra.eas.projectId` to `app.json`. Until then, the alerts screen says notifications aren't set up.
-2. A development build on a real phone. Push notifications don't work in Expo Go, on web or in emulators without Google Play.
+1. An Expo project id. This repo is linked to `@gapasin/fuelwards` (`extra.eas.projectId` in `app.json`). A fork runs `npx eas-cli init` once to link its own.
+2. A build on a real phone. Push notifications don't work in Expo Go, on web or in emulators without Google Play.
 
 ## DOE weekly bulletin
 
@@ -142,7 +151,7 @@ npx eas-cli@latest init
 npx eas-cli@latest build --platform android --profile preview
 ```
 
-`eas init` also sets the project ID that push notifications need. Add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (and the Sentry values, if you use them) as EAS environment variables first.
+Android release builds are shrunk with R8 and include only the `arm64-v8a` and `armeabi-v7a` CPU types (every phone sold in years), via `expo-build-properties` in `app.json`. `eas init` also sets the project ID that push notifications need. Add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (and the Sentry values, if you use them) as EAS environment variables first.
 
 The web app is a static site. `vercel.json` builds it with `npm run build:web` and serves `dist/`, sending every path to `index.html` so deep links work. Import the GitHub repo in Vercel (free Hobby plan) and set the two `EXPO_PUBLIC_SUPABASE_*` variables. Then add the Vercel URL to the Supabase redirect URLs in `supabase/config.toml` and run `npx supabase config push`.
 
@@ -202,10 +211,27 @@ To turn the codes on:
 2. In `supabase/config.toml`, uncomment the two `[auth.email.template.*]` sections and set `enable_confirmations = true`.
 3. Run `npx supabase config push`.
 
+## Shipping fixes (over-the-air updates)
+
+Installed apps check EAS Update for new JavaScript when they start, so most fixes don't need a new APK:
+
+```bash
+npm run update:preview
+```
+
+This publishes the current code to the `preview` channel (the GitHub Release APKs), using the latest commit message as the update's description. Users get it on the next restart. Use `npm run update:production` for Play Store builds.
+
+An update is enough for changes to screens, styles, translations and app logic. A new build (and a new GitHub Release) is needed after adding a package with native code, or changing `app.json` plugins, permissions or the icon. `runtimeVersion` uses the `fingerprint` policy, so a build only receives updates made for the same native code.
+
 ## Checks
 
 ```bash
 npm run check
 ```
 
-This runs the type-check, ESLint, Prettier and the Jest unit tests. CI (`.github/workflows/ci.yml`) also builds the web app and tests the database.
+This runs the type-check, ESLint, Prettier and the Jest unit tests. CI (`.github/workflows/ci.yml`) also builds the web app, tests the database, and runs the end-to-end tests.
+
+- **Database types:** `src/lib/database.types.ts` is generated from the schema and types the Supabase client. After a migration, run `npm run db:types` and commit the result. CI fails if the file doesn't match the migrations.
+- **Web end-to-end (Playwright):** `e2e/web` signs up a new driver, searches a station, opens directions, sets an alert, checks badges and the language switch, and confirms `/admin` is closed to drivers. CI runs it against a local Supabase, never the hosted project. Locally, `npm run build:web` and then `npm run e2e:web` (only point it at a local Supabase, since it creates accounts).
+- **Phone smoke tests (Maestro):** with a phone connected over USB (or an emulator) and the APK installed, run `maestro test -e EMAIL=you@example.com -e PASSWORD=yourpassword e2e/maestro`. Install Maestro from https://maestro.dev.
+- **Architecture and security model:** see [docs/architecture.md](docs/architecture.md).

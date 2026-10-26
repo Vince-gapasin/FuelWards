@@ -13,7 +13,8 @@
       "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
-      "environment": "development"
+      "environment": "development",
+      "channel": "development"
     },
     "preview": {
       "extends": "base",
@@ -21,7 +22,8 @@
       "android": {
         "buildType": "apk"
       },
-      "environment": "preview"
+      "environment": "preview",
+      "channel": "preview"
     },
     "production": {
       "extends": "base",
@@ -29,7 +31,8 @@
       "android": {
         "buildType": "app-bundle"
       },
-      "environment": "production"
+      "environment": "production",
+      "channel": "production"
     }
   },
   "submit": {

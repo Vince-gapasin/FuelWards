@@ -68,3 +68,8 @@ export function sortStations(stations: Station[], mode: SortMode, fuel: string):
 export function directionsUrl(station: Pick<Station, 'latitude' | 'longitude'>): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`;
 }
+
+/** Waze navigation; opens the Waze app when installed, otherwise its website. */
+export function wazeUrl(station: Pick<Station, 'latitude' | 'longitude'>): string {
+  return `https://waze.com/ul?ll=${station.latitude},${station.longitude}&navigate=yes`;
+}

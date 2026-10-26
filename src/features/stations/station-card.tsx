@@ -1,9 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { Linking, Pressable, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { directionsUrl, formatAge, formatDistance, formatPrice } from './format';
+import { DirectionsPicker } from './directions-picker';
+import { formatAge, formatDistance, formatPrice } from './format';
 import type { FuelType, Station } from './types';
 
 type Props = {
@@ -20,6 +22,7 @@ const CARD_FUELS = ['GAS91', 'GAS95', 'DIESEL'];
 
 /** Station card from the prototype carousel ("Unioil · Magsaysay Blvd · 0.6 km"). */
 export function StationCard({ station, fuelTypes, selectedFuel, selected, width, onPress }: Props) {
+  const [picking, setPicking] = useState(false);
   const { t } = useTranslation();
   const codes = CARD_FUELS.includes(selectedFuel)
     ? CARD_FUELS
@@ -101,8 +104,8 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
 
       <View className="flex-row gap-2">
         <Pressable
-          accessibilityRole="link"
-          onPress={() => Linking.openURL(directionsUrl(station))}
+          accessibilityRole="button"
+          onPress={() => setPicking(true)}
           hitSlop={{ top: 4, bottom: 4 }}
           className="h-9 flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-navy active:bg-navy-600">
           <Ionicons name="navigate" size={14} color="#FFFFFF" />
@@ -117,6 +120,7 @@ export function StationCard({ station, fuelTypes, selectedFuel, selected, width,
           <Text className="font-semibold text-sm text-emphasis">{t('card.updatePrice')}</Text>
         </Pressable>
       </View>
+      <DirectionsPicker target={picking ? station : null} onClose={() => setPicking(false)} />
     </View>
   );
 }

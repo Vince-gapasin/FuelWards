@@ -15,7 +15,8 @@ import { useIsAdmin } from '@/features/admin/api';
 import { useProfile } from '@/features/auth/use-profile';
 import { deleteMyAccount, exportFileName, exportMyData } from '@/features/privacy/api';
 import { saveExport } from '@/features/privacy/save-export';
-import { usePointsHistory, useTiers } from '@/features/rewards/api';
+import { useBadges, usePointsHistory, useTiers } from '@/features/rewards/api';
+import { BadgeGrid } from '@/features/rewards/badge-grid';
 import { formatDate, reasonLabel } from '@/features/rewards/format';
 import { TierProgress } from '@/features/rewards/tier-progress';
 import { queryPersister } from '@/lib/query-client';
@@ -27,6 +28,7 @@ export default function Account() {
   const { t } = useTranslation();
   const { data } = useProfile();
   const tiers = useTiers();
+  const badges = useBadges();
   const history = usePointsHistory();
   const queryClient = useQueryClient();
   const showToast = useToast((s) => s.show);
@@ -153,6 +155,8 @@ export default function Account() {
               <TierProgress tier={stats.tier} lifetime={stats.lifetime} tiers={tiers.data} dark />
             </View>
           ) : null}
+
+          {badges.data ? <BadgeGrid summary={badges.data} /> : null}
 
           {stats ? (
             <View className="flex-row flex-wrap gap-2">
