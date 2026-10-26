@@ -108,7 +108,7 @@ src/
 | Level              | Tool                                                                | Runs                                                                                        |
 | ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | Database rules     | pgTAP (`supabase/tests/database`, 125 tests)                        | CI on a fresh local Supabase; on the hosted project in a transaction that always rolls back |
-| Schema ↔ app types | `supabase gen types` diff                                           | CI                                                                                          |
+| Schema ↔ app types | App type-checked against types generated from the migrations        | CI                                                                                          |
 | Pure logic         | Jest (`__tests__` folders)                                          | CI                                                                                          |
 | Web flows          | Playwright (`e2e/web`) against the built web app and local Supabase | CI                                                                                          |
 | Phone flows        | Maestro (`e2e/maestro`)                                             | By hand on a phone or emulator                                                              |
