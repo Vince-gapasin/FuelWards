@@ -33,12 +33,6 @@ jobs:
       # Only our schema: PostGIS's own functions in `extensions` trip the linter.
       - run: supabase db lint --schema public --fail-on error
       - run: supabase test db
-      # The committed types (npm run db:types) must match the migrations. The PostgREST version line
-      # differs between the hosted and local generators, so it's ignored.
-      - name: Check database types are up to date
-        run: |
-          supabase gen types typescript --local --schema public > /tmp/database.types.ts
-          diff <(grep -v PostgrestVersion src/lib/database.types.ts) <(grep -v PostgrestVersion /tmp/database.types.ts)
       # Web end-to-end tests against the local Supabase above (never the hosted project).
       - uses: actions/setup-node@v4
         with:
@@ -59,3 +53,13 @@ jobs:
           name: playwright-report
           path: test-results/
           retention-days: 7
+      # The committed types (npm run db:types) must match the migrations. The hosted and local
+      # generators format differently, so both are run through Prettier before comparing, and the
+      # PostgREST version line is ignored.
+      - name: Check database types are up to date
+        if: success() || failure()
+        run: |
+          supabase gen types typescript --local --schema public > /tmp/local.types.ts
+          npx prettier --stdin-filepath types.ts < /tmp/local.types.ts | grep -v PostgrestVersion > /tmp/local.norm.ts
+          npx prettier --stdin-filepath types.ts < src/lib/database.types.ts | grep -v PostgrestVersion > /tmp/committed.norm.ts
+          diff /tmp/committed.norm.ts /tmp/local.norm.ts
