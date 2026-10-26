@@ -23,7 +23,8 @@
         "buildType": "apk"
       },
       "environment": "preview",
-      "channel": "preview"
+      "channel": "preview",
+      "autoIncrement": true
     },
     "production": {
       "extends": "base",
