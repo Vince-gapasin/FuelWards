@@ -25,6 +25,7 @@ import { StationMap } from '@/features/map/station-map';
 import { FOCUS_ZOOM, type StationMapHandle } from '@/features/map/types';
 import { sortStations } from '@/features/stations/format';
 import { DoeBanner } from '@/features/doe/doe-banner';
+import { WeeklyPriceBanner } from '@/features/doe/weekly-banner';
 import { FuelChips } from '@/features/stations/fuel-chips';
 import { SearchBar } from '@/features/stations/search-bar';
 import { StationCard } from '@/features/stations/station-card';
@@ -191,6 +192,7 @@ export default function Home() {
           />
           <OfflineBanner />
           <DoeBanner fuelTypes={fuelTypes.data ?? []} />
+          <WeeklyPriceBanner fuelTypes={fuelTypes.data ?? []} />
           {locationStatus === 'denied' ? (
             <View className="mx-3">
               <Notice tone="info" message={t('home.locationOff')} />

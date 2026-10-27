@@ -79,6 +79,16 @@ The inbox works everywhere. Phone notifications need two things this repo can't 
 1. An Expo project id. This repo is linked to `@gapasin/fuelwards` (`extra.eas.projectId` in `app.json`). A fork runs `npx eas-cli init` once to link its own.
 2. A build on a real phone. Push notifications don't work in Expo Go, on web or in emulators without Google Play.
 
+## Weekly prices (automatic)
+
+The DOE publishes no machine-readable price feed, so FuelWards works out each week's prices from its own data, with no admin input. Weeks run Tuesday to Monday (Manila time), like the DOE's adjustments.
+
+- Every day at 20:00 Manila, the pg_cron job `fuelwards-weekly-prices` runs `refresh_weekly_price_summary()`. Per fuel, it takes each open station's latest confirmed price this week and last week, then the median, so a busy station counts once. Results go to `weekly_price_summaries`.
+- The home screen shows this week's medians and the change from last week ("Diesel ₱63.00 (+₱2.00)"). A fuel appears only when at least `weekly_summary_min_stations` (in `app_config`, default 3) stations have a confirmed price this week. The change appears only when last week had that many too.
+- From Wednesday to Friday, the first time a fuel has a change, `announce_weekly_prices()` pushes it once to drivers who have weekly price notifications on (Price alerts → Weekly price changes). If there isn't enough data by Friday, no push is sent that week.
+
+These are drivers' actual pump prices, not the DOE's announced range. The DOE bulletin below stays as the official line.
+
 ## DOE weekly bulletin
 
 The home screen shows the Department of Energy's weekly price adjustment when one is on file for the current week. It shows bulletins from up to 6 days ago through up to 7 days ahead. Admins enter each week's bulletin in the admin console (DOE bulletins). You can also add them in the Supabase SQL editor, with one row per fuel and peso-per-litre changes (negative for rollbacks):

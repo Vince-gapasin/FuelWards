@@ -130,6 +130,12 @@ export const en = {
     dismiss: 'Dismiss price adjustment notice',
     range: '{{from}} to {{to}}',
   },
+  weekly: {
+    title: 'This week from drivers',
+    basis_one: 'Median of confirmed prices at {{count}}+ stations, updated daily.',
+    basis_other: 'Median of confirmed prices at {{count}}+ stations, updated daily.',
+    dismiss: 'Dismiss this week’s prices',
+  },
   map: {
     noPrice: 'no price yet',
     yourLocation: 'Your location',
@@ -355,9 +361,9 @@ export const en = {
     },
   },
   alerts: {
-    doeTitle: 'Weekly DOE price adjustment',
+    doeTitle: 'Weekly price changes',
     doeHint:
-      'Get a notification when the Department of Energy announces next week’s price changes.',
+      'A notification each week with how pump prices changed, from drivers’ confirmed prices and the DOE’s announcement.',
     title: 'Price alerts',
     push: {
       unsupported: 'Notifications work in the phone app. Matches also appear in your inbox below.',

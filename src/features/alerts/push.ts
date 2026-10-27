@@ -63,7 +63,7 @@ export function useAlertNotificationTaps() {
     const open = (response: Notifications.NotificationResponse | null) => {
       const data = response?.notification.request.content.data;
       if (typeof data?.stationId === 'string') router.push(`/station/${data.stationId}`);
-      else if (data?.kind === 'doe') router.push('/');
+      else if (data?.kind === 'doe' || data?.kind === 'weekly') router.push('/');
     };
     Notifications.getLastNotificationResponseAsync().then(open);
     const sub = Notifications.addNotificationResponseReceivedListener(open);

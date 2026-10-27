@@ -694,6 +694,65 @@ export type Database = {
           },
         ]
       }
+      weekly_price_announcements: {
+        Row: {
+          body: string
+          created_at: string
+          recipients: number
+          week_start: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          recipients: number
+          week_start: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          recipients?: number
+          week_start?: string
+        }
+        Relationships: []
+      }
+      weekly_price_summaries: {
+        Row: {
+          fuel_type: string
+          median_price: number
+          prev_median: number | null
+          prev_station_count: number
+          station_count: number
+          updated_at: string
+          week_start: string
+        }
+        Insert: {
+          fuel_type: string
+          median_price: number
+          prev_median?: number | null
+          prev_station_count?: number
+          station_count: number
+          updated_at?: string
+          week_start: string
+        }
+        Update: {
+          fuel_type?: string
+          median_price?: number
+          prev_median?: number | null
+          prev_station_count?: number
+          station_count?: number
+          updated_at?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_price_summaries_fuel_type_fkey"
+            columns: ["fuel_type"]
+            isOneToOne: false
+            referencedRelation: "fuel_types"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
     }
     Views: {
       station_latest_prices: {
@@ -800,6 +859,7 @@ export type Database = {
           verified_reports: number
         }[]
       }
+      announce_weekly_prices: { Args: { p_now?: string }; Returns: number }
       config_number: { Args: { config_key: string }; Returns: number }
       create_price_alert: {
         Args: {
@@ -820,6 +880,16 @@ export type Database = {
           effective_date: string
           fuel_type: string
           source_url: string
+        }[]
+      }
+      current_weekly_prices: {
+        Args: { p_now?: string }
+        Returns: {
+          change: number
+          fuel_type: string
+          median_price: number
+          station_count: number
+          week_start: string
         }[]
       }
       decide_report: {
@@ -867,6 +937,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      manila_week_start: { Args: { p_at: string }; Returns: string }
       my_badges: { Args: never; Returns: Json }
       my_data_export: { Args: never; Returns: Json }
       my_points: {
@@ -927,7 +998,12 @@ export type Database = {
       process_pending_reports: { Args: never; Returns: number }
       purge_old_report_locations: { Args: never; Returns: number }
       redeem_reward: { Args: { p_reward_id: string }; Returns: Json }
+      refresh_weekly_price_summary: {
+        Args: { p_now?: string }
+        Returns: number
+      }
       require_admin: { Args: never; Returns: undefined }
+      run_weekly_price_summary: { Args: never; Returns: undefined }
       search_stations: {
         Args: { lat: number; lng: number; query: string }
         Returns: {

@@ -134,6 +134,12 @@ export const fil: Translations = {
     dismiss: 'Isara ang abiso ng price adjustment',
     range: '{{from}} hanggang {{to}}',
   },
+  weekly: {
+    title: 'Ngayong linggo, mula sa mga driver',
+    basis_one: 'Median ng kumpirmadong presyo sa {{count}}+ na station, ina-update araw-araw.',
+    basis_other: 'Median ng kumpirmadong presyo sa {{count}}+ na station, ina-update araw-araw.',
+    dismiss: 'Isara ang presyo ngayong linggo',
+  },
   map: {
     noPrice: 'wala pang presyo',
     yourLocation: 'Ang iyong lokasyon',
@@ -364,9 +370,9 @@ export const fil: Translations = {
     },
   },
   alerts: {
-    doeTitle: 'Lingguhang price adjustment ng DOE',
+    doeTitle: 'Lingguhang pagbabago ng presyo',
     doeHint:
-      'Makatanggap ng notification kapag inanunsyo ng Department of Energy ang pagbabago ng presyo sa susunod na linggo.',
+      'Notification bawat linggo kung paano nagbago ang presyo sa pump, mula sa kumpirmadong presyo ng mga driver at sa anunsyo ng DOE.',
     title: 'Price alerts',
     push: {
       unsupported:

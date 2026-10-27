@@ -30,14 +30,14 @@ flowchart LR
   Cron -->|every 5 min| Net -->|HTTPS| Push --> A
 ```
 
-| Piece              | Where it runs                            | Notes                                                                                      |
-| ------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| App                | Phones (EAS Build APK/AAB), web (Vercel) | Expo SDK 58, Expo Router, NativeWind, TanStack Query, MapLibre                             |
-| Updates            | EAS Update                               | JavaScript fixes reach installed apps without a reinstall (`npm run update:preview`)       |
-| Database and API   | Supabase (free plan)                     | Postgres 17 with PostGIS; PostgREST exposes tables and functions                           |
-| Background jobs    | `pg_cron` inside Postgres                | Auto-verify quiet prices (15 min), send pushes (5 min), erase old report locations (daily) |
-| Push notifications | `pg_net` → Expo Push API                 | No separate server or Edge Function needed                                                 |
-| Station data       | OpenStreetMap (Overpass API)             | 1,450 Metro Manila stations, imported by `scripts/import-osm-stations.ts`                  |
+| Piece              | Where it runs                            | Notes                                                                                                                                               |
+| ------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App                | Phones (EAS Build APK/AAB), web (Vercel) | Expo SDK 58, Expo Router, NativeWind, TanStack Query, MapLibre                                                                                      |
+| Updates            | EAS Update                               | JavaScript fixes reach installed apps without a reinstall (`npm run update:preview`)                                                                |
+| Database and API   | Supabase (free plan)                     | Postgres 17 with PostGIS; PostgREST exposes tables and functions                                                                                    |
+| Background jobs    | `pg_cron` inside Postgres                | Auto-verify quiet prices (15 min), send pushes (5 min), weekly price summary and its push (daily, 20:00 Manila), erase old report locations (daily) |
+| Push notifications | `pg_net` → Expo Push API                 | No separate server or Edge Function needed                                                                                                          |
+| Station data       | OpenStreetMap (Overpass API)             | 1,450 Metro Manila stations, imported by `scripts/import-osm-stations.ts`                                                                           |
 
 ## The core loop: report → confirm → points → reward
 
