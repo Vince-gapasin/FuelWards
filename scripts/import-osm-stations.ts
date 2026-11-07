@@ -1,4 +1,5 @@
-// Imports Metro Manila fuel stations from OpenStreetMap into a new Supabase migration.
+// Imports fuel stations from OpenStreetMap into a new Supabase migration, one query per region
+// the app covers (the same regions as the DOE price import), tagging each station with its region.
 //
 //   node scripts/import-osm-stations.ts
 //
@@ -9,20 +10,29 @@ import { readdirSync, writeFileSync } from 'node:fs';
 
 import { toSql, toStation, type OsmElement, type StationRow } from './osm-stations.ts';
 
-// Metro Manila plus its immediate edges (south, west, north, east).
-const BBOX = '14.35,120.90,14.78,121.14';
-const QUERY = `[out:json][timeout:120];nwr["amenity"="fuel"](${BBOX});out center tags;`;
+// OSM administrative boundaries (relation id + 3600000000 = Overpass area id), keyed by the
+// DOE region code used in public.doe_regions. Metro Manila first: a station on a shared border
+// keeps the first region it was found in.
+const REGIONS: { code: string; name: string; area: number }[] = [
+  { code: 'NCR', name: 'Metro Manila', area: 3600147488 },
+  { code: 'III', name: 'Central Luzon', area: 3601552195 },
+  { code: 'IV-A', name: 'CALABARZON', area: 3601552120 },
+  { code: 'IV-B', name: 'MIMAROPA', area: 3601552261 },
+  { code: 'V', name: 'Bicol Region', area: 3603561455 },
+];
+const query = (area: number) =>
+  `[out:json][timeout:180];area(id:${area})->.r;nwr["amenity"="fuel"](area.r);out center tags;`;
 const SERVERS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
   'https://overpass.private.coffee/api/interpreter',
 ];
-const USER_AGENT = 'FuelWards/0.1 (capstone project; https://github.com/Vince-gapasin/FuelWards)';
+const USER_AGENT = 'FuelWards/0.2 (capstone project; https://github.com/Vince-gapasin/FuelWards)';
 const MAX_ROUNDS = 6;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function fetchElements(): Promise<OsmElement[]> {
+async function fetchElements(q: string): Promise<OsmElement[]> {
   let wait = 15_000;
   for (let round = 1; round <= MAX_ROUNDS; round++) {
     for (const server of SERVERS) {
@@ -33,11 +43,10 @@ async function fetchElements(): Promise<OsmElement[]> {
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': USER_AGENT,
           },
-          body: `data=${encodeURIComponent(QUERY)}`,
+          body: `data=${encodeURIComponent(q)}`,
         });
         if (res.ok) {
           const json = (await res.json()) as { elements: OsmElement[] };
-          console.log(`Fetched ${json.elements.length} elements from ${server}`);
           return json.elements;
         }
         console.log(`${server} → HTTP ${res.status}`);
@@ -54,12 +63,22 @@ async function fetchElements(): Promise<OsmElement[]> {
   throw new Error('Overpass servers are unavailable. Try again later.');
 }
 
-const elements = await fetchElements();
-const stations = elements.map(toStation).filter((s): s is StationRow => s !== null);
-// Keep one row per osm id (Overpass can repeat elements) and a stable order for clean diffs.
-const unique = [...new Map(stations.map((s) => [s.osmId, s])).values()].sort(
-  (a, b) => a.osmId - b.osmId,
-);
+// One row per osm id (Overpass can repeat elements; border stations can appear in two regions).
+const byId = new Map<number, StationRow>();
+for (const region of REGIONS) {
+  const elements = await fetchElements(query(region.area));
+  let added = 0;
+  for (const el of elements) {
+    const station = toStation(el);
+    if (station && !byId.has(station.osmId)) {
+      byId.set(station.osmId, { ...station, region: region.code });
+      added++;
+    }
+  }
+  console.log(`${region.name}: ${elements.length} elements, ${added} stations`);
+}
+// A stable order for clean diffs.
+const unique = [...byId.values()].sort((a, b) => a.osmId - b.osmId);
 
 // Migrations apply in filename order, so the new one must sort after every existing migration.
 const now = Number(new Date().toISOString().replace(/\D/g, '').slice(0, 14));
@@ -67,10 +86,13 @@ const latest = Math.max(
   0,
   ...readdirSync('supabase/migrations').map((f) => Number(f.slice(0, 14)) || 0),
 );
-const file = `supabase/migrations/${Math.max(now, latest + 1)}_import_ncr_stations.sql`;
+const file = `supabase/migrations/${Math.max(now, latest + 1)}_import_luzon_stations.sql`;
 writeFileSync(
   file,
-  toSql(unique, `Overpass API, bbox ${BBOX}, ${new Date().toISOString().slice(0, 10)}`),
+  toSql(
+    unique,
+    `Overpass API, regions ${REGIONS.map((r) => r.code).join(', ')}, ${new Date().toISOString().slice(0, 10)}`,
+  ),
 );
 
 const byBrand = unique.reduce<Record<string, number>>((acc, s) => {

@@ -51,3 +51,6 @@ public/maplibre-gl-worker.mjs
 # Playwright
 test-results/
 playwright-report/
+
+# Python
+__pycache__/

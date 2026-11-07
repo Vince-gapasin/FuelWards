@@ -207,6 +207,108 @@ export type Database = {
           },
         ]
       }
+      doe_area_prices: {
+        Row: {
+          area: string
+          common_price: number | null
+          fuel_type: string
+          price_max: number
+          price_min: number
+          region: string
+          week_start: string
+        }
+        Insert: {
+          area: string
+          common_price?: number | null
+          fuel_type: string
+          price_max: number
+          price_min: number
+          region: string
+          week_start: string
+        }
+        Update: {
+          area?: string
+          common_price?: number | null
+          fuel_type?: string
+          price_max?: number
+          price_min?: number
+          region?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doe_area_prices_fuel_type_fkey"
+            columns: ["fuel_type"]
+            isOneToOne: false
+            referencedRelation: "fuel_types"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "doe_area_prices_region_fkey"
+            columns: ["region"]
+            isOneToOne: false
+            referencedRelation: "doe_regions"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      doe_price_imports: {
+        Row: {
+          area_count: number
+          id: number
+          imported_at: string
+          region: string
+          source_url: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          area_count: number
+          id?: number
+          imported_at?: string
+          region: string
+          source_url: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          area_count?: number
+          id?: number
+          imported_at?: string
+          region?: string
+          source_url?: string
+          week_end?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doe_price_imports_region_fkey"
+            columns: ["region"]
+            isOneToOne: false
+            referencedRelation: "doe_regions"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      doe_regions: {
+        Row: {
+          code: string
+          name: string
+          sort: number
+        }
+        Insert: {
+          code: string
+          name: string
+          sort?: number
+        }
+        Update: {
+          code?: string
+          name?: string
+          sort?: number
+        }
+        Relationships: [
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -260,6 +362,25 @@ export type Database = {
           sort?: number
         }
         Relationships: []
+      }
+      ingest_tokens: {
+        Row: {
+          created_at: string
+          name: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          token_hash?: string
+        }
+        Relationships: [
+        ]
       }
       points_ledger: {
         Row: {
@@ -661,6 +782,7 @@ export type Database = {
           location: unknown
           name: string
           osm_id: number | null
+          region: string | null
         }
         Insert: {
           address?: string | null
@@ -672,6 +794,7 @@ export type Database = {
           location: unknown
           name: string
           osm_id?: number | null
+          region?: string | null
         }
         Update: {
           address?: string | null
@@ -683,6 +806,7 @@ export type Database = {
           location?: unknown
           name?: string
           osm_id?: number | null
+          region?: string | null
         }
         Relationships: [
           {
@@ -691,6 +815,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "brands"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stations_region_fkey"
+            columns: ["region"]
+            isOneToOne: false
+            referencedRelation: "doe_regions"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -900,6 +1031,51 @@ export type Database = {
         Returns: undefined
       }
       delete_my_account: { Args: never; Returns: undefined }
+      doe_prices: {
+        Args: { p_region: string }
+        Returns: {
+          area_count: number
+          fuel_type: string
+          price_max: number
+          price_min: number
+          region: string
+          region_name: string
+          source_url: string
+          typical_price: number
+          week_end: string
+          week_start: string
+        }[]
+      }
+      doe_prices_for_station: {
+        Args: { p_station_id: string }
+        Returns: {
+          area_count: number
+          fuel_type: string
+          price_max: number
+          price_min: number
+          region: string
+          region_name: string
+          source_url: string
+          typical_price: number
+          week_end: string
+          week_start: string
+        }[]
+      }
+      doe_prices_near: {
+        Args: { p_lat: number; p_lng: number }
+        Returns: {
+          area_count: number
+          fuel_type: string
+          price_max: number
+          price_min: number
+          region: string
+          region_name: string
+          source_url: string
+          typical_price: number
+          week_end: string
+          week_start: string
+        }[]
+      }
       favorite_stations: {
         Args: { lat: number; lng: number }
         Returns: {
@@ -917,6 +1093,10 @@ export type Database = {
       }
       format_peso_change: { Args: { n: number }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      ingest_doe_prices: {
+        Args: { p_report: Json; p_token: string }
+        Returns: number
+      }
       leaderboard: {
         Args: { p_period?: string }
         Returns: {

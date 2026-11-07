@@ -134,6 +134,17 @@ export const fil: Translations = {
     dismiss: 'Isara ang abiso ng price adjustment',
     range: '{{from}} hanggang {{to}}',
   },
+  doePrices: {
+    title: 'Presyo ng DOE ngayong linggo · {{region}}',
+    week_one: '{{week}} · {{count}} lugar na sinuri',
+    week_other: '{{week}} · {{count}} lugar na sinuri',
+    typical: 'Karaniwan {{price}}',
+    note: 'Ang karaniwan ay ang gitna ng mga common price na nakita ng DOE sa bawat lungsod o bayan. Maaaring iba ang presyo sa station na ito.',
+    report: 'Tingnan ang ulat ng DOE',
+    bannerTitle: 'DOE ngayong linggo · {{region}}, {{week}}',
+    banner: '{{fuel}}: karaniwang {{price}} ({{range}})',
+    dismiss: 'Isara ang presyo ng DOE ngayong linggo',
+  },
   weekly: {
     title: 'Ngayong linggo, mula sa mga driver',
     basis_one: 'Median ng kumpirmadong presyo sa {{count}}+ na station, ina-update araw-araw.',

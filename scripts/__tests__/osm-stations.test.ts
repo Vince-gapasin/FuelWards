@@ -96,5 +96,26 @@ describe('toSql', () => {
     expect(sql).toContain("'Aling Nena''s Gas'");
     expect(sql).toContain('on conflict (osm_id) do update');
     expect(sql).toContain('OpenStreetMap contributors');
+    expect(sql).toContain('14.6, 121, 11, null)');
+  });
+
+  it('stores the DOE region without erasing a known one', () => {
+    const sql = toSql(
+      [
+        {
+          osmId: 21,
+          brandSlug: 'petron',
+          name: 'Petron',
+          address: null,
+          city: null,
+          lat: 13.6,
+          lng: 123.2,
+          region: 'V',
+        },
+      ],
+      'test',
+    );
+    expect(sql).toContain("13.6, 123.2, 21, 'V')");
+    expect(sql).toContain('region = coalesce(excluded.region, public.stations.region)');
   });
 });

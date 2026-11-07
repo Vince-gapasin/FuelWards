@@ -1,0 +1,36 @@
+name: DOE prices
+
+# Imports the DOE's weekly pump prices (Metro Manila, Central Luzon, CALABARZON, MIMAROPA, Bicol).
+# The DOE posts new PDFs on no fixed day, so this checks twice a day; already-imported files are
+# skipped. If it fails (an upload is refused, or no region has a recent week), GitHub emails the
+# repository owner.
+on:
+  schedule:
+    - cron: '0 2,10 * * *' # 10:00 and 18:00 Manila time
+  workflow_dispatch:
+
+concurrency:
+  group: doe-prices
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/doe/requirements.txt
+      - run: pip install -r scripts/doe/requirements.txt
+      - name: Import new DOE price reports
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          DOE_INGEST_TOKEN: ${{ secrets.DOE_INGEST_TOKEN }}
+        run: python scripts/doe/import_doe_prices.py

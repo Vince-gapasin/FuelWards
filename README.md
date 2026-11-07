@@ -34,7 +34,7 @@ Map and native modules need a development build (`npx expo run:android` or `npx 
 
 ## Stations
 
-Stations come from OpenStreetMap (all `amenity=fuel` in and around Metro Manila). To refresh them, run:
+Stations come from OpenStreetMap: every `amenity=fuel` in Metro Manila, Central Luzon, CALABARZON, MIMAROPA and the Bicol Region (about 5,300). Each station is tagged with its region, so the app can show that region's DOE prices. To refresh them, run:
 
 ```bash
 node scripts/import-osm-stations.ts
@@ -81,13 +81,47 @@ The inbox works everywhere. Phone notifications need two things this repo can't 
 
 ## Weekly prices (automatic)
 
-The DOE publishes no machine-readable price feed, so FuelWards works out each week's prices from its own data, with no admin input. Weeks run Tuesday to Monday (Manila time), like the DOE's adjustments.
+Besides the DOE's figures (next section), FuelWards works out each week's Metro Manila prices from drivers' own reports, with no admin input. Weeks run Tuesday to Monday (Manila time), like the DOE's adjustments.
 
 - Every day at 20:00 Manila, the pg_cron job `fuelwards-weekly-prices` runs `refresh_weekly_price_summary()`. Per fuel, it takes each open station's latest confirmed price this week and last week, then the median, so a busy station counts once. Results go to `weekly_price_summaries`.
 - The home screen shows this week's medians and the change from last week ("Diesel ₱63.00 (+₱2.00)"). A fuel appears only when at least `weekly_summary_min_stations` (in `app_config`, default 3) stations have a confirmed price this week. The change appears only when last week had that many too.
 - From Wednesday to Friday, the first time a fuel has a change, `announce_weekly_prices()` pushes it once to drivers who have weekly price notifications on (Price alerts → Weekly price changes). If there isn't enough data by Friday, no push is sent that week.
 
 These are drivers' actual pump prices, not the DOE's announced range. The DOE bulletin below stays as the official line.
+
+## DOE prices (automatic import)
+
+The DOE has no API. Each week its field offices post a PDF per area ("Price Monitoring of Liquid Fuels") with each city's price range and common price per fuel. A scheduled GitHub Actions job, [`doe-prices.yml`](.github/workflows/doe-prices.yml), imports them for Metro Manila, Central Luzon, CALABARZON, MIMAROPA and Bicol:
+
+- At 10:00 and 18:00 Manila, [`scripts/doe/import_doe_prices.py`](scripts/doe/import_doe_prices.py) reads the DOE's listing pages, downloads PDFs it hasn't imported, and reads their tables with pdfplumber.
+- It sends each region's rows to `ingest_doe_prices()`. That function accepts only the DOE import token (only its SHA-256 hash is stored, in `ingest_tokens`), checks every price, and replaces that region's week, so re-runs are harmless.
+- A station's page shows its region's latest week: per fuel, the typical price (the median of the cities' common prices) and the lowest and highest price seen, with a link to the DOE's PDF. The map shows the same for the selected fuel in the region around its centre. Weeks older than 4 weeks aren't shown.
+- The job fails, and GitHub emails the repository owner, if an upload is refused or no region has a week that ended in the last 10 days (for example, if the DOE changes its page).
+
+**Central Luzon is often missing.** The North Luzon office usually posts scanned images instead of text PDFs, and those can't be read without OCR. Its week appears only when a text PDF is posted. The job logs "scanned image" for those files.
+
+One-time setup (already done for the hosted project):
+
+1. Make a token and store its hash, replacing `<token>` (SQL editor):
+
+   ```sql
+   insert into public.ingest_tokens (name, token_hash)
+   values ('doe_prices', extensions.digest('<token>', 'sha256'))
+   on conflict (name) do update set token_hash = excluded.token_hash;
+   ```
+
+2. Add repository secrets `DOE_INGEST_TOKEN` (the token), `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (the same values as `.env.local`).
+3. Run it once from the Actions tab (DOE prices → Run workflow).
+
+To try the reader without uploading anything:
+
+```bash
+pip install -r scripts/doe/requirements.txt
+```
+
+```bash
+python scripts/doe/import_doe_prices.py --dry-run
+```
 
 ## DOE weekly bulletin
 

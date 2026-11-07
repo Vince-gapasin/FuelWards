@@ -9,6 +9,7 @@ import { Button } from '@/components/button';
 import { Notice } from '@/components/notice';
 import { ScreenHeader } from '@/components/screen-header';
 import { useToast } from '@/components/toast';
+import { DoePricesSection } from '@/features/doe/doe-prices';
 import { usePendingReports, useStationDetails } from '@/features/reports/api';
 import { DirectionsPicker } from '@/features/stations/directions-picker';
 import { formatAge, formatPrice } from '@/features/stations/format';
@@ -132,6 +133,8 @@ export default function StationDetail() {
               })}
             </View>
           </View>
+
+          <DoePricesSection stationId={id} fuelTypes={fuelTypes.data ?? []} />
 
           <View className="gap-3">
             <Text className="font-bold text-lg text-ink">{t('station.last30')}</Text>

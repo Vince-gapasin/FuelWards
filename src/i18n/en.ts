@@ -130,6 +130,17 @@ export const en = {
     dismiss: 'Dismiss price adjustment notice',
     range: '{{from}} to {{to}}',
   },
+  doePrices: {
+    title: 'DOE prices this week · {{region}}',
+    week_one: '{{week}} · {{count}} area monitored',
+    week_other: '{{week}} · {{count}} areas monitored',
+    typical: 'Typical {{price}}',
+    note: 'Typical is the middle of the common prices the DOE saw in each city or town. Prices at this station may differ.',
+    report: 'View the DOE report',
+    bannerTitle: 'DOE this week · {{region}}, {{week}}',
+    banner: '{{fuel}} typically {{price}} ({{range}})',
+    dismiss: 'Dismiss this week’s DOE prices',
+  },
   weekly: {
     title: 'This week from drivers',
     basis_one: 'Median of confirmed prices at {{count}}+ stations, updated daily.',

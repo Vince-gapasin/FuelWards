@@ -18,6 +18,8 @@ flowchart LR
     Net[pg_net]
   end
   Push[Expo Push service]
+  GHA[GitHub Actions<br/>DOE price import]
+  DOE[DOE website<br/>weekly PDFs]
   Tiles[OpenFreeMap tiles]
   Sentry[Sentry<br/>crash reports]
 
@@ -28,6 +30,8 @@ flowchart LR
   A -. optional .-> Sentry
   DB -->|trigger on verified price| RT
   Cron -->|every 5 min| Net -->|HTTPS| Push --> A
+  GHA -->|downloads| DOE
+  GHA -->|ingest_doe_prices + token| DB
 ```
 
 | Piece              | Where it runs                            | Notes                                                                                                                                               |
@@ -37,7 +41,8 @@ flowchart LR
 | Database and API   | Supabase (free plan)                     | Postgres 17 with PostGIS; PostgREST exposes tables and functions                                                                                    |
 | Background jobs    | `pg_cron` inside Postgres                | Auto-verify quiet prices (15 min), send pushes (5 min), weekly price summary and its push (daily, 20:00 Manila), erase old report locations (daily) |
 | Push notifications | `pg_net` → Expo Push API                 | No separate server or Edge Function needed                                                                                                          |
-| Station data       | OpenStreetMap (Overpass API)             | 1,450 Metro Manila stations, imported by `scripts/import-osm-stations.ts`                                                                           |
+| DOE prices         | GitHub Actions (twice a day)             | Reads the DOE's weekly PDFs with pdfplumber and uploads each region's rows through a token-checked function                                         |
+| Station data       | OpenStreetMap (Overpass API)             | About 5,300 stations in Metro Manila, Central Luzon, CALABARZON, MIMAROPA and Bicol, imported by `scripts/import-osm-stations.ts`                   |
 
 ## The core loop: report → confirm → points → reward
 
@@ -107,9 +112,10 @@ src/
 
 | Level              | Tool                                                                | Runs                                                                                        |
 | ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Database rules     | pgTAP (`supabase/tests/database`, 125 tests)                        | CI on a fresh local Supabase; on the hosted project in a transaction that always rolls back |
+| Database rules     | pgTAP (`supabase/tests/database`, 160 tests)                        | CI on a fresh local Supabase; on the hosted project in a transaction that always rolls back |
 | Schema ↔ app types | App type-checked against types generated from the migrations        | CI                                                                                          |
 | Pure logic         | Jest (`__tests__` folders)                                          | CI                                                                                          |
+| DOE PDF reader     | Python `unittest` (`scripts/doe/test_doe_parse.py`)                 | CI                                                                                          |
 | Web flows          | Playwright (`e2e/web`) against the built web app and local Supabase | CI                                                                                          |
 | Phone flows        | Maestro (`e2e/maestro`)                                             | By hand on a phone or emulator                                                              |
 | Static checks      | TypeScript, ESLint, Prettier                                        | CI                                                                                          |
